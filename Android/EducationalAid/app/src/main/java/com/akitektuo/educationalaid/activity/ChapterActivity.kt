@@ -3,6 +3,7 @@ package com.akitektuo.educationalaid.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.widget.Toast
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.ModuleAdapter
 import kotlinx.android.synthetic.main.activity_chapter.*
@@ -14,6 +15,7 @@ class ChapterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chapter)
         buttonBack.setOnClickListener { finish() }
 
+        Toast.makeText(this, "Intent with id ${intent.getIntExtra("key_id", 0)}", Toast.LENGTH_SHORT).show()
         textChapterName.text = "CSS3 Basics"
         listModules.layoutManager = LinearLayoutManager(this)
         val moduleModels = ArrayList<ModuleAdapter.ModuleModel>()

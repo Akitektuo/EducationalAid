@@ -9,10 +9,11 @@
 
     <ImageView
         android:id="@+id/imageChapter"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_marginBottom="4dp"
-        android:src="@drawable/learn" />
+        android:elevation="4dp"
+        android:padding="16dp" />
 
     <TextView
         android:id="@+id/textChapter"
@@ -20,6 +21,29 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textColor="@color/colorSilverDark"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:textColor="@color/colorSilver" />
+
+        <ProgressBar
+            android:id="@+id/progressCount"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:progressTint="@color/colorSilverDark" />
+
+    </LinearLayout>
 
 </LinearLayout>

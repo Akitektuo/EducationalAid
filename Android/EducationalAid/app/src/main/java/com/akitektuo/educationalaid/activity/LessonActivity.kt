@@ -1,29 +1,24 @@
-package com.akitektuo.educationalaid.fragment
+package com.akitektuo.educationalaid.activity
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.ChapterAdapter
-import com.akitektuo.educationalaid.adapter.LessonAdapter
 import com.akitektuo.educationalaid.adapter.ModuleAdapter
-import kotlinx.android.synthetic.main.fragment_learn.*
+import kotlinx.android.synthetic.main.activity_lesson.*
 
-/**
- * Created by Akitektuo on 31.12.2017.
- */
+class LessonActivity : AppCompatActivity() {
 
-class LearnFragment : Fragment() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_lesson)
+        buttonBack.setOnClickListener { finish() }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? = inflater.inflate(R.layout.fragment_learn, container, false)
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        listLessons.layoutManager = LinearLayoutManager(context)
+        Toast.makeText(this, "Intent with id ${intent.getIntExtra("key_id", 0)}", Toast.LENGTH_SHORT).show()
+        textLessonName.text = "CSS"
+        listChapters.layoutManager = LinearLayoutManager(this)
         val moduleModels = ArrayList<ModuleAdapter.ModuleModel>()
         moduleModels.add(ModuleAdapter.ModuleModel(1, 1, 12, "Introduction to CSS3", 3, 2))
         moduleModels.add(ModuleAdapter.ModuleModel(2, 2, 12, "Vendor Prefixes", 2, 2))
@@ -49,9 +44,6 @@ class LearnFragment : Fragment() {
         }
         chapterModels.add(ChapterAdapter.ChapterModel(6, "Gradients & Backgrounds", "image_white", "image_silver", 0, moduleModelsCopy))
         chapterModels.add(ChapterAdapter.ChapterModel(6, "Transitions & Transforms", "transform_white", "transform_silver", 0, moduleModelsCopy))
-        val lessonModels = ArrayList<LessonAdapter.LessonModel>()
-        lessonModels.add(LessonAdapter.LessonModel(1, "CSS", "css", chapterModels))
-        listLessons.adapter = LessonAdapter(context, lessonModels)
+        listChapters.adapter = ChapterAdapter(this, chapterModels)
     }
-
 }
