@@ -16,10 +16,11 @@ class TabbedPagerComponent(
         private val pager: ViewPager,
         private val tab: TabLayout,
         private val fragments: ArrayList<PagerAdapter.TabFragment>,
-        private val startingPage: Int = 0) : TabLayout.OnTabSelectedListener {
+        private val startingPage: Int = 0) : TabLayout.OnTabSelectedListener, ViewPager.OnPageChangeListener {
 
     init {
         pager.adapter = PagerAdapter(activity.supportFragmentManager, fragments)
+        pager.addOnPageChangeListener(this)
         tab.setupWithViewPager(pager)
         tab.addOnTabSelectedListener(this)
         with(tab) {
@@ -44,6 +45,23 @@ class TabbedPagerComponent(
         with(tab) {
             setIcon(fragments[position].image)
         }
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {
+    }
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        if (position < fragments.size - 1) {
+            if (fragments[position + 1].locked && positionOffset > 0) {
+                tab.getTabAt(position)?.select()
+            }
+        }
+        if (fragments[position].locked) {
+            tab.getTabAt(position - 1)?.select()
+        }
+    }
+
+    override fun onPageSelected(position: Int) {
     }
 
 }

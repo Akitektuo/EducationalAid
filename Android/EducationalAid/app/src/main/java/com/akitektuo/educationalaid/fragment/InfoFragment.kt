@@ -14,30 +14,35 @@ import kotlinx.android.synthetic.main.fragment_info.*
 
 class InfoFragment : Fragment() {
 
-    val KEY_ID = "key_id"
-    val KEY_TITLE = "key_title"
-    val KEY_CONTENT = "key_content"
-    val KEY_IMAGE = "key_image"
-    val KEY_IMPORTANT = "key_important"
+    companion object {
+        val KEY_ID = "key_id"
+        val KEY_TITLE = "key_title"
+        val KEY_CONTENT = "key_content"
+        val KEY_IMAGE = "key_image"
+        val KEY_IMPORTANT = "key_important"
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = inflater.inflate(R.layout.fragment_info, container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        if (savedInstanceState != null) {
-            textTitle.text = savedInstanceState.getString(KEY_TITLE)
-            textContent.text = savedInstanceState.getString(KEY_CONTENT)
-            if (savedInstanceState.getString(KEY_IMAGE).isNullOrEmpty()) {
+        val bundle = arguments
+        with(bundle) {
+            //            if (savedInstanceState != null) {
+            textTitle.text = getString(KEY_TITLE)
+            textContent.text = getString(KEY_CONTENT)
+            if (getString(KEY_IMAGE).isNullOrEmpty()) {
                 imageContent.visibility = View.GONE
             } else {
-                imageContent.setImageResource(resources.getIdentifier(savedInstanceState.getString(KEY_IMAGE), "drawable", context.packageName))
+                imageContent.setImageResource(resources.getIdentifier(getString(KEY_IMAGE), "drawable", context.packageName))
             }
-            if (savedInstanceState.getString(KEY_IMPORTANT).isNullOrEmpty()) {
+            if (getString(KEY_IMPORTANT).isNullOrEmpty()) {
                 layoutImportant.visibility = View.GONE
             } else {
-                textImportant.text = savedInstanceState.getString(KEY_IMPORTANT)
+                textImportant.text = getString(KEY_IMPORTANT)
             }
+//            }
         }
     }
 

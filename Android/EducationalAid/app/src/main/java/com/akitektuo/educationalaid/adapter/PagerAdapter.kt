@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter
  */
 class PagerAdapter(manager: FragmentManager, private val fragmentList: ArrayList<TabFragment>) : FragmentPagerAdapter(manager) {
 
-    data class TabFragment(val fragment: Fragment, val image: Int, val imageSelected: Int)
+    data class TabFragment(val fragment: Fragment, val image: Int, val imageSelected: Int, val imageLocked: Int = 0, val locked: Boolean = false)
 
     override fun getItem(position: Int): Fragment {
         return fragmentList[position].fragment

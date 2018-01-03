@@ -7,6 +7,11 @@ import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.PagerAdapter
 import com.akitektuo.educationalaid.component.TabbedPagerComponent
 import com.akitektuo.educationalaid.fragment.InfoFragment
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_CONTENT
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_ID
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_IMAGE
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_IMPORTANT
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_TITLE
 import kotlinx.android.synthetic.main.activity_module.*
 
 class ModuleActivity : AppCompatActivity() {
@@ -20,15 +25,21 @@ class ModuleActivity : AppCompatActivity() {
         textModuleName.text = "text-shadow"
 
         val fragments = ArrayList<PagerAdapter.TabFragment>()
-        val fragmentInfo = InfoFragment()
-        val arguments = Bundle()
-        arguments.putInt(fragmentInfo.KEY_ID, 1)
-        arguments.putString(fragmentInfo.KEY_TITLE, "The text-shadow Property")
-        arguments.putString(fragmentInfo.KEY_CONTENT, "The text-shadow property defines one or more comma-separated shadow effects, to be applied to the text content of the current element.\n\nThe image below shows how the text-shadow property is applied:")
-        arguments.putString(fragmentInfo.KEY_IMAGE, "content")
-        arguments.putString(fragmentInfo.KEY_IMPORTANT, "- The offset-x and offset-y values are required for the CSS text-shadow property.\n- The color value is not required, but since the default for the text-shadow is transparent, the text-shadow will not appear unless you specify a color value.")
-        fragmentInfo.arguments = arguments
-        fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected))
+        for (i in 0..9) {
+            val fragmentInfo = InfoFragment()
+            val arguments = Bundle()
+            arguments.putInt(KEY_ID, 1)
+            arguments.putString(KEY_TITLE, "The text-shadow Property")
+            arguments.putString(KEY_CONTENT, "The text-shadow property defines one or more comma-separated shadow effects, to be applied to the text content of the current element.\n\nThe image below shows how the text-shadow property is applied:")
+            arguments.putString(KEY_IMAGE, "content")
+            arguments.putString(KEY_IMPORTANT, "- The offset-x and offset-y values are required for the CSS text-shadow property.\n- The color value is not required, but since the default for the text-shadow is transparent, the text-shadow will not appear unless you specify a color value.")
+            fragmentInfo.arguments = arguments
+            if (i < 4) {
+                fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected))
+            } else {
+                fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected, locked = true))
+            }
+        }
         TabbedPagerComponent(this, pager, tab, fragments)
     }
 
