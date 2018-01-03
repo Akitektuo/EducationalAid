@@ -1,12 +1,14 @@
 package com.akitektuo.educationalaid.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.activity.ModuleActivity
 import kotlinx.android.synthetic.main.item_module.view.*
 
 /**
@@ -36,7 +38,9 @@ class ModuleAdapter(private val context: Context, private val modules: ArrayList
             }
             if (module.status != 0) {
                 cardModule.setOnClickListener {
-                    android.widget.Toast.makeText(context, "soon", android.widget.Toast.LENGTH_SHORT).show()
+                    val intent = Intent(context, ModuleActivity::class.java)
+                    intent.putExtra("key_id", module.id)
+                    context.startActivity(intent)
                 }
             }
             when (module.status) {

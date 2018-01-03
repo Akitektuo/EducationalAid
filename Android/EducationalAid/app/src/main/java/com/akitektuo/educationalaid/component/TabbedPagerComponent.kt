@@ -11,7 +11,7 @@ import com.akitektuo.educationalaid.adapter.PagerAdapter
  * Created by Akitektuo on 03.01.2018.
  */
 
-class TabedPagerComponent(
+class TabbedPagerComponent(
         private val activity: AppCompatActivity,
         private val pager: ViewPager,
         private val tab: TabLayout,
