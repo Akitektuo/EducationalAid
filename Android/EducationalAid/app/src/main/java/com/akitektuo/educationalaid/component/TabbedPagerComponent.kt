@@ -6,6 +6,8 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.inputmethod.InputMethodManager
 import com.akitektuo.educationalaid.adapter.PagerAdapter
+import com.akitektuo.educationalaid.fragment.InfoFragment
+import com.akitektuo.educationalaid.fragment.QuestionFragment
 
 /**
  * Created by Akitektuo on 03.01.2018.
@@ -25,7 +27,11 @@ class TabbedPagerComponent(
         tab.addOnTabSelectedListener(this)
         with(tab) {
             for (i in 0 until fragments.size) {
-                getTabAt(i)?.setIcon(fragments[i].image)
+                if (fragments[i].locked) {
+                    getTabAt(i)?.setIcon(fragments[i].imageLocked)
+                } else {
+                    getTabAt(i)?.setIcon(fragments[i].image)
+                }
             }
             getTabAt(startingPage)?.setIcon(fragments[startingPage].imageSelected)
         }
@@ -37,13 +43,17 @@ class TabbedPagerComponent(
     override fun onTabSelected(tab: TabLayout.Tab) {
         (activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
         with(tab) {
-            setIcon(fragments[position].imageSelected)
+            if (!fragments[position].locked) {
+                setIcon(fragments[position].imageSelected)
+            }
         }
     }
 
     override fun onTabUnselected(tab: TabLayout.Tab) {
         with(tab) {
-            setIcon(fragments[position].image)
+            if (!fragments[position].locked) {
+                setIcon(fragments[position].image)
+            }
         }
     }
 
@@ -51,17 +61,28 @@ class TabbedPagerComponent(
     }
 
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-        if (position < fragments.size - 1) {
-            if (fragments[position + 1].locked && positionOffset > 0) {
-                tab.getTabAt(position)?.select()
-            }
-        }
         if (fragments[position].locked) {
             tab.getTabAt(position - 1)?.select()
         }
     }
 
     override fun onPageSelected(position: Int) {
+    }
+
+    fun nextFragment() {
+        val position = tab.selectedTabPosition + 1
+        if (position == fragments.size) {
+            activity.finish()
+        } else {
+            with(fragments[position]) {
+                locked = false
+                when (fragment) {
+                    is InfoFragment -> fragment.unlockFragment()
+                    is QuestionFragment -> fragment.unlockFragment()
+                }
+            }
+            tab.getTabAt(position)?.select()
+        }
     }
 
 }

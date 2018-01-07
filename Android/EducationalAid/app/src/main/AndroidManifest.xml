@@ -18,7 +18,9 @@
         </activity>
         <activity android:name=".activity.ChapterActivity" />
         <activity android:name=".activity.LessonActivity" />
-        <activity android:name=".activity.ModuleActivity"></activity>
+        <activity
+            android:name=".activity.ModuleActivity"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
