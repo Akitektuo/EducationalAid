@@ -1,7 +1,6 @@
 package com.akitektuo.educationalaid.fragment
 
 import android.content.DialogInterface
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -80,19 +79,18 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         super.onActivityCreated(savedInstanceState)
 
         val bundle = arguments
-        buttonContinue.text = "Check"
 
         with(bundle) {
             textCount.text = "1/2"
             textTask.text = "Add a 25-pixel left and 15-pixel down blue text-shadow."
-            when (3) {
+            when (getInt(KEY_ID) - 2) {
                 TYPE_FILL_IN -> decodeForFillIn("p {\ntext-shadow: -_?_25_?_px _?_15_?_px blue;\n}")
                 TYPE_SINGLE_CHOICE -> decodeForSingleChoice("_?_inset\ninner\ninside")
                 TYPE_MULTIPLE_CHOICE -> decodeForMultipleChoice("Horizontal offset\n_?_Spread distance\nVertical offset\n_?_Blur distance")
                 TYPE_DRAG_IN_ORDER -> decodeForDragInOrder("0_?_Horizontal offset\n2_?_Blur\n1_?_Vertical offset\n3_?_Spread\n4_?_Color")
                 TYPE_DRAG_AND_DROP -> decodeForDragAndDrop("p {\ntext-shadow: -_?_25_?_px _?_15_?_px blue;\n}")
             }
-            if (getInt(KEY_ID) == 4) {
+            if (getInt(KEY_ID) == 0) {
                 imageLocked.visibility = View.VISIBLE
             }
         }
@@ -101,6 +99,9 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     }
 
     private fun decodeForFillIn(info: String) {
+        reset()
+        resultsFillIn.clear()
+        layoutFillIn.removeAllViews()
         for (lineTemp in info.split("\n")) {
             var textCheck = 0
             var line = lineTemp
@@ -145,40 +146,35 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
             //decrement user's xp
             for (x in resultsFillIn) {
                 x.editText.setText(x.text)
-                x.editText.setTextColor(Color.GREEN)
             }
-            buttonContinue.text = "Continue"
+            correct()
         }
 
         buttonContinue.setOnClickListener {
-            if (buttonContinue.text.toString() == "Check") {
-                if (resultsFillIn.none { it.text != it.editText.text.toString() }) {
-                    //good message
-                    Toast.makeText(context, "Correct", Toast.LENGTH_SHORT).show()
-                    buttonContinue.text = "Continue"
-                } else {
-                    //wrong message
-                    Toast.makeText(context, "Wrong", Toast.LENGTH_SHORT).show()
-                }
-                for (x in resultsFillIn) {
-                    if (x.editText.text.toString() == x.text) {
-                        x.editText.setTextColor(Color.GREEN)
+            when (buttonContinue.text.toString()) {
+                "Check" -> {
+                    if (resultsFillIn.none { it.text != it.editText.text.toString() }) {
+                        correct()
                     } else {
-                        x.editText.setTextColor(Color.RED)
+                        wrong()
                     }
                 }
-            } else {
-                for (x in resultsFillIn) {
-                    x.editText.setTextColor(Color.BLACK)
-                    x.editText.setText("")
+                "Continue" -> {
+                    layoutFillIn.removeAllViews()
+                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
                 }
-                buttonContinue.text = "Check"
-                (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                "Try Again" -> {
+                    decodeForFillIn(info)
+                    reset()
+                }
             }
         }
     }
 
     private fun decodeForSingleChoice(info: String) {
+        radioGroup.removeAllViews()
+        reset()
+        resultsSingleChoice.clear()
         cardSingleChoice.visibility = View.VISIBLE
         val choices = info.split("\n")
         for (x in choices.shuffled()) {
@@ -189,49 +185,34 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
             //decrement user's xp
             for (x in resultsSingleChoice) {
                 x.radioButton.isChecked = x.checked
-                if (x.checked) {
-                    x.radioButton.setTextColor(Color.GREEN)
-                } else {
-                    x.radioButton.setTextColor(Color.BLACK)
-                }
             }
-            buttonContinue.text = "Continue"
+            correct()
         }
 
         buttonContinue.setOnClickListener {
-            if (buttonContinue.text.toString() == "Check") {
-                val isOk = resultsSingleChoice.none { it.checked != it.radioButton.isChecked }
-                if (isOk) {
-                    //good message
-                    Toast.makeText(context, "Correct", Toast.LENGTH_SHORT).show()
-                    buttonContinue.text = "Continue"
-                } else {
-                    //wrong message
-                    Toast.makeText(context, "Wrong", Toast.LENGTH_SHORT).show()
-                }
-                for (x in resultsSingleChoice) {
-                    if (x.radioButton.isChecked) {
-                        if (isOk) {
-                            x.radioButton.setTextColor(Color.GREEN)
-                        } else {
-                            x.radioButton.setTextColor(Color.RED)
-                        }
+            when (buttonContinue.text.toString()) {
+                "Check" -> {
+                    if (resultsSingleChoice.none { it.checked != it.radioButton.isChecked }) {
+                        correct()
                     } else {
-                        x.radioButton.setTextColor(Color.BLACK)
+                        wrong()
                     }
                 }
-            } else {
-                for (x in resultsSingleChoice) {
-                    x.radioButton.setTextColor(Color.BLACK)
-                    x.radioButton.isChecked = false
+                "Continue" -> {
+                    decodeForSingleChoice(info)
+                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
                 }
-                buttonContinue.text = "Check"
-                (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                "Try Again" -> {
+                    decodeForSingleChoice(info)
+                }
             }
         }
     }
 
     private fun decodeForMultipleChoice(info: String) {
+        layoutMultipleChoice.removeAllViews()
+        reset()
+        resultsMultipleChoice.clear()
         cardMultipleChoice.visibility = View.VISIBLE
         val choices = info.split("\n")
         for (x in choices.shuffled()) {
@@ -242,49 +223,33 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
             //decrement user's xp
             for (x in resultsMultipleChoice) {
                 x.checkBox.isChecked = x.checked
-                if (x.checked) {
-                    x.checkBox.setTextColor(Color.GREEN)
-                } else {
-                    x.checkBox.setTextColor(Color.BLACK)
-                }
             }
-            buttonContinue.text = "Continue"
+            correct()
         }
 
         buttonContinue.setOnClickListener {
-            if (buttonContinue.text.toString() == "Check") {
-                val isOk = resultsMultipleChoice.none { it.checked != it.checkBox.isChecked }
-                if (isOk) {
-                    //good message
-                    Toast.makeText(context, "Correct", Toast.LENGTH_SHORT).show()
-                    buttonContinue.text = "Continue"
-                } else {
-                    //wrong message
-                    Toast.makeText(context, "Wrong", Toast.LENGTH_SHORT).show()
-                }
-                for (x in resultsMultipleChoice) {
-                    if (x.checkBox.isChecked) {
-                        if (isOk) {
-                            x.checkBox.setTextColor(Color.GREEN)
-                        } else {
-                            x.checkBox.setTextColor(Color.RED)
-                        }
+            when (buttonContinue.text.toString()) {
+                "Check" -> {
+                    if (resultsMultipleChoice.none { it.checked != it.checkBox.isChecked }) {
+                        correct()
                     } else {
-                        x.checkBox.setTextColor(Color.BLACK)
+                        wrong()
                     }
                 }
-            } else {
-                for (x in resultsMultipleChoice) {
-                    x.checkBox.setTextColor(Color.BLACK)
-                    x.checkBox.isChecked = false
+                "Continue" -> {
+                    decodeForMultipleChoice(info)
+                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
                 }
-                buttonContinue.text = "Check"
-                (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                "Try Again" -> {
+                    decodeForMultipleChoice(info)
+                }
             }
         }
     }
 
     private fun decodeForDragInOrder(info: String) {
+        reset()
+        resultDraggable.clear()
         listDraggable.visibility = View.VISIBLE
         info.split("\n").shuffled()
                 .map { it.split("_?_") }
@@ -297,14 +262,44 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
         onUnlock = { _, _ ->
             //decrement user's xp
-            for (i in 0 until resultDraggable.size) {
-                listDraggable.adapter.notifyItemMoved(i, resultDraggable[i].position)
+            var i = 0
+            while (i < resultDraggable.size) {
+                if (i != resultDraggable[i].position) {
+                    listDraggable.adapter.notifyItemMoved(i, resultDraggable[i].position)
+                    val movedValue = resultDraggable[i]
+                    for (j in i until movedValue.position) {
+                        resultDraggable[j] = resultDraggable[j + 1]
+                    }
+                    resultDraggable[movedValue.position] = movedValue
+                    i--
+                }
+                i++
             }
-            buttonContinue.text = "Continue"
+            correct()
+        }
+
+        buttonContinue.setOnClickListener {
+            when (buttonContinue.text.toString()) {
+                "Check" -> {
+                    if ((0 until resultDraggable.size).none { it != resultDraggable[it].position }) {
+                        correct()
+                    } else {
+                        wrong()
+                    }
+                }
+                "Continue" -> {
+                    decodeForDragInOrder(info)
+                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                }
+                "Try Again" -> {
+                    decodeForDragInOrder(info)
+                }
+            }
         }
     }
 
     private fun decodeForDragAndDrop(info: String) {
+        reset()
 
     }
 
@@ -411,6 +406,25 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     override fun onStartDrag(viewHolder: RecyclerView.ViewHolder) {
         itemTouchHelper.startDrag(viewHolder)
+    }
+
+    private fun reset() {
+        cardResult.visibility = View.GONE
+        layoutResultCorrect.visibility = View.GONE
+        layoutResultWrong.visibility = View.GONE
+        buttonContinue.text = "Check"
+    }
+
+    private fun correct() {
+        cardResult.visibility = View.VISIBLE
+        layoutResultCorrect.visibility = View.VISIBLE
+        buttonContinue.text = "Continue"
+    }
+
+    private fun wrong() {
+        cardResult.visibility = View.VISIBLE
+        layoutResultWrong.visibility = View.VISIBLE
+        buttonContinue.text = "Try Again"
     }
 
 }

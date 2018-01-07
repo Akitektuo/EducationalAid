@@ -7,4 +7,6 @@
     <color name="colorBlack">#323232</color>
     <color name="white">#FFFFFF</color>
     <color name="background">#FAFAFA</color>
+    <color name="correct">#27AE60</color>
+    <color name="wrong">#C0392B</color>
 </resources>

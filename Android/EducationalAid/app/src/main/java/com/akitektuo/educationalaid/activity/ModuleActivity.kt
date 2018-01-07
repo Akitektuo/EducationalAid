@@ -24,7 +24,7 @@ class ModuleActivity : AppCompatActivity(), Fragment.OnClickContinue {
         textModuleName.text = "text-shadow"
 
         val fragments = ArrayList<PagerAdapter.TabFragment>()
-        for (i in 0..3) {
+        for (i in 0..5) {
             val fragmentInfo = InfoFragment()
             val argumentsInfo = Bundle()
             argumentsInfo.putInt(InfoFragment.KEY_ID, i + 1)
@@ -36,8 +36,10 @@ class ModuleActivity : AppCompatActivity(), Fragment.OnClickContinue {
             when (i) {
                 0 -> fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected))
                 1 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
-                2 -> fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected, R.drawable.book_silver, true))
-                3 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected, R.drawable.question_silver, true))
+                2 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+                3 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+                4 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+                5 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
             }
         }
         tabbedPager = TabbedPagerComponent(this, pager, tab, fragments)
