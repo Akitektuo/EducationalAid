@@ -1,6 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageSound"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/sound" />
+
+    <TextView
+        android:id="@+id/textSound"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/enable_sound"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageSound"
+        app:layout_constraintEnd_toStartOf="@+id/switchSound"
+        app:layout_constraintStart_toEndOf="@+id/imageSound"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageBarSound"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageSound"
+        app:srcCompat="@color/colorSilverLight" />
+
+    <ImageView
+        android:id="@+id/imageLanguage"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageBarSound"
+        app:srcCompat="@drawable/language" />
+
+    <TextView
+        android:id="@+id/textLanguage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/change_language"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageLanguage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageLanguage"
+        app:layout_constraintTop_toTopOf="@+id/imageLanguage" />
+
+    <ImageView
+        android:id="@+id/imageBarLanguage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageLanguage"
+        app:srcCompat="@color/colorSilverLight" />
+
+    <ImageView
+        android:id="@+id/imageEditProfile"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageBarLanguage"
+        app:srcCompat="@drawable/edit_account" />
+
+    <TextView
+        android:id="@+id/textEditProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/edit_profile"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageEditProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageEditProfile"
+        app:layout_constraintTop_toTopOf="@+id/imageEditProfile" />
+
+    <ImageView
+        android:id="@+id/imageBarEditProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageEditProfile"
+        app:srcCompat="@color/colorSilverLight" />
+
+    <ImageView
+        android:id="@+id/imageChangePassword"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageBarEditProfile"
+        app:srcCompat="@drawable/reset_password" />
+
+    <TextView
+        android:id="@+id/textChangePassword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/change_password"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageChangePassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageChangePassword"
+        app:layout_constraintTop_toTopOf="@+id/imageChangePassword" />
+
+    <ImageView
+        android:id="@+id/imageBarChangePassword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageChangePassword"
+        app:srcCompat="@color/colorSilverLight" />
+
+    <ImageView
+        android:id="@+id/imageSignOut"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageChangePassword"
+        app:srcCompat="@drawable/sign_out" />
+
+    <TextView
+        android:id="@+id/textSignOut"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/sign_out_all"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageSignOut"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageSignOut"
+        app:layout_constraintTop_toBottomOf="@+id/imageChangePassword" />
+
+    <ImageView
+        android:id="@+id/imageBarSignOut"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageSignOut"
+        app:srcCompat="@color/colorSilverLight" />
+
+    <ImageView
+        android:id="@+id/imageReset"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageBarSignOut"
+        app:srcCompat="@drawable/reset" />
+
+    <TextView
+        android:id="@+id/textReset"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/reset"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageReset"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageReset"
+        app:layout_constraintTop_toTopOf="@+id/imageReset" />
+
+    <Switch
+        android:id="@+id/switchSound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/textLanguage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

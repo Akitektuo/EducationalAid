@@ -42,14 +42,14 @@ class ChapterAdapter(private val context: Context, private val chapters: ArrayLi
             when (chapter.status) {
                 0 -> {
                     drawableBackground.setColor(resources.getColor(R.color.colorSilverLight))
-                    textCount.text = "0/${chapter.modules.size}"
+                    textCount.text = context.getString(R.string.out_of, 0, chapter.modules.size)
                     progressCount.visibility = View.GONE
                     imageChapter.setImageResource(resources.getIdentifier(chapter.imageLocked, "drawable", context.packageName))
                 }
                 1 -> {
                     drawableBackground.setColor(resources.getColor(R.color.colorSilverDark))
                     val count = chapter.modules.count { it.status == 2 }
-                    textCount.text = "$count/${chapter.modules.size}"
+                    textCount.text = context.getString(R.string.out_of, count, chapter.modules.size)
                     progressCount.progress = count
                     progressCount.max = chapter.modules.size - 1
                     imageChapter.setImageResource(resources.getIdentifier(chapter.image, "drawable", context.packageName))

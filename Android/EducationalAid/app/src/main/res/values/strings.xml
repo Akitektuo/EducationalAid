@@ -1,3 +1,32 @@
 <resources>
-    <string name="app_name">Educational Aid</string>
+    <string name="app_name">Learning Aid</string>
+    <string name="guest">Guest</string>
+    <string name="level">Level %1$d</string>
+    <string name="xp" translatable="false">%1$d XP</string>
+    <string name="sign_in">Sign in to synchronize data</string>
+    <string name="sign_in_email">Sign in with email</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="sign_in_facebook">Sign in with Facebook</string>
+    <string name="enable_sound">Enable sound</string>
+    <string name="change_language">Change language</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="change_password">Change password</string>
+    <string name="sign_out_all">Sign out of all accounts</string>
+    <string name="reset">Reset</string>
+    <string name="percent" translatable="false">%1$d%%</string>
+    <string name="out_of" translatable="false">%1$d/%2$d</string>
+    <string name="question">1 question</string>
+    <string name="questions">%1$d questions</string>
+    <string name="continue_button">Continue</string>
+    <string name="try_again">Try again</string>
+    <string name="check">Check</string>
+    <string name="correct">Correct!</string>
+    <string name="wrong">Wrong!</string>
+    <string name="hint">Hint</string>
+    <string name="unlock">Unlock</string>
+    <string name="dialog_hint_title">Get a Hint</string>
+    <string name="dialog_hint_body">Use 5XP of your %1$dXP to get a hint.</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_unlock_title">Unlock Answer</string>
+    <string name="dialog_unlock_body">Use 15XP of your %1$dXP to unlock the correct answer.</string>
 </resources>

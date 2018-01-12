@@ -29,7 +29,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="1/4"
                     android:textColor="@color/colorBlack"
                     android:textSize="12sp" />
 
@@ -53,7 +52,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Unlock"
+                        android:text="@string/unlock"
                         android:textAllCaps="true"
                         android:textColor="@color/colorBlack"
                         android:textSize="12sp" />
@@ -81,7 +80,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hint"
+                        android:text="@string/hint"
                         android:textAllCaps="true"
                         android:textColor="@color/colorBlack"
                         android:textSize="12sp" />
@@ -95,7 +94,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Add a 25-pixel left and 15-pixel down blue text-shadow."
                 android:textSize="18sp" />
 
             <LinearLayout
@@ -151,6 +149,29 @@
                 android:scrollbars="none"
                 android:visibility="gone" />
 
+            <LinearLayout
+                android:id="@+id/layoutDragAndDrop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="128dp">
+
+                    <LinearLayout
+                        android:id="@+id/layoutDragAndDropKeys"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="gone" />
+
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>
@@ -164,7 +185,7 @@
         android:layout_margin="16dp"
         android:background="@color/colorAccent"
         android:elevation="4dp"
-        android:text="Continue"
+        android:text="@string/continue_button"
         android:textColor="@color/white" />
 
     <ImageView
@@ -207,7 +228,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
-                android:text="Correct!"
+                android:text="@string/correct"
                 android:textColor="@color/correct"
                 android:textSize="24sp" />
 
@@ -234,7 +255,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
-                android:text="Wrong!"
+                android:text="@string/wrong"
                 android:textColor="@color/wrong"
                 android:textSize="24sp" />
 

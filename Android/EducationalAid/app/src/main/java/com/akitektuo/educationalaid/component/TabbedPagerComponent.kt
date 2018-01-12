@@ -34,6 +34,7 @@ class TabbedPagerComponent(
                 }
             }
             getTabAt(startingPage)?.setIcon(fragments[startingPage].imageSelected)
+            getTabAt(startingPage)?.select()
         }
     }
 

@@ -16,11 +16,11 @@ import kotlinx.android.synthetic.main.item_module.view.*
  */
 class ModuleAdapter(private val context: Context, private val modules: ArrayList<ModuleModel>) : RecyclerView.Adapter<ModuleAdapter.ViewHolder>() {
 
-    data class ModuleModel(val id: Int, val number: Int, val total: Int, val name: String, val questions: Int, val status: Int)
+    data class ModuleModel(val id: Int, val number: Int, val name: String, val questions: Int, val status: Int)
 
     override fun onBindViewHolder(holder: ModuleAdapter.ViewHolder, position: Int) {
         holder.setIsRecyclable(false)
-        holder.bind(modules[position])
+        holder.bind(modules, position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ModuleAdapter.ViewHolder = ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_module, parent, false))
@@ -29,12 +29,13 @@ class ModuleAdapter(private val context: Context, private val modules: ArrayList
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(module: ModuleModel) = with(itemView) {
-            textCount.text = "${module.number}/${module.total}"
+        fun bind(modules: ArrayList<ModuleModel>, pos: Int) = with(itemView) {
+            val module = modules[pos]
+            textCount.text = context.getString(R.string.out_of, module.number, modules.size)
             textTitle.text = module.name
-            textQuestions.text = "${module.questions} question"
+            textQuestions.text = context.getString(R.string.question)
             if (module.questions > 1) {
-                textQuestions.text = textQuestions.text.toString() + "s"
+                textQuestions.text = context.getString(R.string.questions, module.questions)
             }
             if (module.status != 0) {
                 cardModule.setOnClickListener {

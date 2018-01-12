@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ajutor de Învățare</string>
+    <string name="guest">Vizitator</string>
+    <string name="level">Nivelul %1$d</string>
+    <string name="sign_in">Conectați-vă pentru a sincroniza datele</string>
+    <string name="sign_in_email">Conectare prin email</string>
+    <string name="sign_in_google">Conectare prin Google</string>
+    <string name="sign_in_facebook">Conectare prin Facebook</string>
+    <string name="enable_sound">Activare sunet</string>
+    <string name="change_language">Schimbare limbă</string>
+    <string name="edit_profile">Editare profil</string>
+    <string name="change_password">Schimbare parola</string>
+    <string name="sign_out_all">Ieșire din toate conturile</string>
+    <string name="reset">Resetare</string>
+    <string name="question">O întrebare</string>
+    <string name="questions">%1$d întrebări</string>
+    <string name="continue_button">Continuă</string>
+    <string name="try_again">Încearcă din nou</string>
+    <string name="check">Verifică</string>
+    <string name="correct">Corect!</string>
+    <string name="wrong">Greșit!</string>
+    <string name="hint">Sugestie</string>
+    <string name="unlock">Deblocare</string>
+    <string name="dialog_hint_title">Primește o Sugestie</string>
+    <string name="dialog_hint_body">Utilizați 5XP din %1$dXP pentru o sugestie.</string>
+    <string name="cancel">Anulare</string>
+    <string name="dialog_unlock_title">Deblocare Răspuns</string>
+    <string name="dialog_unlock_body">Utilizați 15XP din %1$dXP pentru a debloca răspunsul corect.</string>
+</resources>

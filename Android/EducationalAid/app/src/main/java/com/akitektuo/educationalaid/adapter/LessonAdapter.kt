@@ -40,7 +40,7 @@ class LessonAdapter(private val context: Context, private val lessons: ArrayList
             val count = lesson.chapters.sumBy { it.modules.count { it.status == 2 } }
             progressCount.progress = count
             progressCount.max = total
-            textProgress.text = "${count * 100 / total}%"
+            textProgress.text = context.getString(R.string.percent, count * 100 / total)
         }
 
     }

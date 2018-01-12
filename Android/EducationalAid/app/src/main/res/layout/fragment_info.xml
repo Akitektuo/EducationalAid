@@ -89,7 +89,7 @@
                     android:layout_margin="16dp"
                     android:background="@color/colorAccent"
                     android:elevation="4dp"
-                    android:text="Continue"
+                    android:text="@string/continue_button"
                     android:textColor="@color/white" />
 
             </RelativeLayout>
