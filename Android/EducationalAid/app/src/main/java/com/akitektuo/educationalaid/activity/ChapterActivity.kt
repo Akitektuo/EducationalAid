@@ -1,14 +1,20 @@
 package com.akitektuo.educationalaid.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.ModuleAdapter
+import com.akitektuo.educationalaid.fragment.SettingsFragment
 import kotlinx.android.synthetic.main.activity_chapter.*
 
 class ChapterActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(SettingsFragment.Language(newBase!!).wrap())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

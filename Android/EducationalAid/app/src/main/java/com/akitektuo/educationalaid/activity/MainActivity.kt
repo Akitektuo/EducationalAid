@@ -1,5 +1,6 @@
 package com.akitektuo.educationalaid.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.akitektuo.educationalaid.R
@@ -28,6 +29,10 @@ class MainActivity : AppCompatActivity() {
         fragments.add(PagerAdapter.TabFragment(ProfileFragment(), R.drawable.profile, R.drawable.profile_selected))
         fragments.add(PagerAdapter.TabFragment(SettingsFragment(), R.drawable.settings, R.drawable.settings_selected))
         TabbedPagerComponent(this, pager, tab, fragments, 1)
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(SettingsFragment.Language(newBase!!).wrap())
     }
 
 }

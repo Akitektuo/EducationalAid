@@ -27,4 +27,8 @@
     <string name="cancel">Anulare</string>
     <string name="dialog_unlock_title">Deblocare Răspuns</string>
     <string name="dialog_unlock_body">Utilizați 15XP din %1$dXP pentru a debloca răspunsul corect.</string>
+    <string name="dialog_language_title">Schimbați limba</string>
+    <string name="dialog_language_body">Schimbați limba din romană în engleză?</string>
+    <string name="yes">Da</string>
+    <string name="no">Nu</string>
 </resources>

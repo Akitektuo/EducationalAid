@@ -21,6 +21,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.DraggableAdapter
+import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference
+import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference.Companion.KEY_SOUND
 import com.akitektuo.educationalaid.util.ItemTouchHelperCallback
 import kotlinx.android.synthetic.main.fragment_question.*
 
@@ -48,6 +50,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     private val dragAndDropKeys = ArrayList<TextView>()
     private var onUnlock = { _: DialogInterface, _: Int -> }
     private var itemTouchHelper = ItemTouchHelper(null)
+    private var preference: SettingsPreference? = null
 
     private data class FillIn(val editText: EditText, val text: String, var nextFocus: EditText? = null) : TextWatcher {
 
@@ -82,6 +85,8 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        preference = SettingsPreference(context)
 
         val bundle = arguments
 
@@ -510,14 +515,18 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     }
 
     private fun correct() {
-        MediaPlayer.create(context, R.raw.correct).start()
+        if (preference?.getBoolean(KEY_SOUND)!!) {
+            MediaPlayer.create(context, R.raw.correct).start()
+        }
         cardResult.visibility = View.VISIBLE
         layoutResultCorrect.visibility = View.VISIBLE
         buttonContinue.text = getString(R.string.continue_button)
     }
 
     private fun wrong() {
-        MediaPlayer.create(context, R.raw.wrong).start()
+        if (preference?.getBoolean(KEY_SOUND)!!) {
+            MediaPlayer.create(context, R.raw.wrong).start()
+        }
         cardResult.visibility = View.VISIBLE
         layoutResultWrong.visibility = View.VISIBLE
         buttonContinue.text = getString(R.string.try_again)

@@ -29,4 +29,8 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_unlock_title">Unlock Answer</string>
     <string name="dialog_unlock_body">Use 15XP of your %1$dXP to unlock the correct answer.</string>
+    <string name="dialog_language_title">Change language</string>
+    <string name="dialog_language_body">Change language from English to Romanian?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

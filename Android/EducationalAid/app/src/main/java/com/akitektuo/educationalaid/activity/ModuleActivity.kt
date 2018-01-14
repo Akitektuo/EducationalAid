@@ -1,5 +1,6 @@
 package com.akitektuo.educationalaid.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
@@ -8,12 +9,17 @@ import com.akitektuo.educationalaid.adapter.PagerAdapter
 import com.akitektuo.educationalaid.component.TabbedPagerComponent
 import com.akitektuo.educationalaid.fragment.InfoFragment
 import com.akitektuo.educationalaid.fragment.QuestionFragment
+import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.notifier.Fragment
 import kotlinx.android.synthetic.main.activity_module.*
 
 class ModuleActivity : AppCompatActivity(), Fragment.OnClickContinue {
 
     private var tabbedPager: TabbedPagerComponent? = null
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(SettingsFragment.Language(newBase!!).wrap())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
