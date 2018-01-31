@@ -9,8 +9,8 @@ import com.akitektuo.educationalaid.component.TabbedPagerComponent
 import com.akitektuo.educationalaid.fragment.LearnFragment
 import com.akitektuo.educationalaid.fragment.ProfileFragment
 import com.akitektuo.educationalaid.fragment.SettingsFragment
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference.Companion.KEY_CREATED
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_CREATED
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {

@@ -12,9 +12,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.akitektuo.educationalaid.R
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference.Companion.KEY_LANGUAGE
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference.Companion.KEY_SOUND
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_LANGUAGE
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_SOUND
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.util.*
 

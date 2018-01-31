@@ -1,4 +1,4 @@
-package com.akitektuo.educationalaid.storage.local.preference
+package com.akitektuo.educationalaid.storage.preference
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -21,8 +21,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.DraggableAdapter
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference
-import com.akitektuo.educationalaid.storage.local.preference.SettingsPreference.Companion.KEY_SOUND
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_SOUND
 import com.akitektuo.educationalaid.util.ItemTouchHelperCallback
 import kotlinx.android.synthetic.main.fragment_question.*
 
@@ -33,13 +33,13 @@ import kotlinx.android.synthetic.main.fragment_question.*
 class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     companion object {
-        val KEY_ID = "key_id"
+        const val KEY_ID = "key_id"
 
-        val TYPE_FILL_IN = 0
-        val TYPE_SINGLE_CHOICE = 1
-        val TYPE_MULTIPLE_CHOICE = 2
-        val TYPE_DRAG_IN_ORDER = 3
-        val TYPE_DRAG_AND_DROP = 4
+        const val TYPE_FILL_IN = 0
+        const val TYPE_SINGLE_CHOICE = 1
+        const val TYPE_MULTIPLE_CHOICE = 2
+        const val TYPE_DRAG_IN_ORDER = 3
+        const val TYPE_DRAG_AND_DROP = 4
     }
 
     private val resultsFillIn = ArrayList<FillIn>()
@@ -49,8 +49,8 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     private val resultsDragAndDrop = ArrayList<DragAndDrop>()
     private val dragAndDropKeys = ArrayList<TextView>()
     private var onUnlock = { _: DialogInterface, _: Int -> }
-    private var itemTouchHelper = ItemTouchHelper(null)
-    private var preference: SettingsPreference? = null
+    private lateinit var itemTouchHelper: ItemTouchHelper
+    private lateinit var preference: SettingsPreference
 
     private data class FillIn(val editText: EditText, val text: String, var nextFocus: EditText? = null) : TextWatcher {
 
@@ -515,7 +515,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     }
 
     private fun correct() {
-        if (preference?.getBoolean(KEY_SOUND)!!) {
+        if (preference.getBoolean(KEY_SOUND)!!) {
             MediaPlayer.create(context, R.raw.correct).start()
         }
         cardResult.visibility = View.VISIBLE
@@ -524,7 +524,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     }
 
     private fun wrong() {
-        if (preference?.getBoolean(KEY_SOUND)!!) {
+        if (preference.getBoolean(KEY_SOUND)!!) {
             MediaPlayer.create(context, R.raw.wrong).start()
         }
         cardResult.visibility = View.VISIBLE
