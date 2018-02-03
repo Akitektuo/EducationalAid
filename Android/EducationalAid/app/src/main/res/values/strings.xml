@@ -3,7 +3,7 @@
     <string name="guest">Guest</string>
     <string name="level">Level %1$d</string>
     <string name="xp" translatable="false">%1$d XP</string>
-    <string name="sign_in">Sign in to synchronize data</string>
+    <string name="sign_in_to_sync">Sign in to synchronize data</string>
     <string name="sign_in_email">Sign in with email</string>
     <string name="sign_in_google">Sign in with Google</string>
     <string name="sign_in_facebook">Sign in with Facebook</string>
@@ -11,7 +11,7 @@
     <string name="change_language">Change language</string>
     <string name="edit_profile">Edit profile</string>
     <string name="change_password">Change password</string>
-    <string name="sign_out_all">Sign out of all accounts</string>
+    <string name="sign_out">Sign out</string>
     <string name="reset">Reset</string>
     <string name="percent" translatable="false">%1$d%%</string>
     <string name="out_of" translatable="false">%1$d/%2$d</string>
@@ -33,4 +33,23 @@
     <string name="dialog_language_body">Change language from English to Romanian?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="enter_name">Enter name</string>
+    <string name="connection_needed">Connection needed</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="auth_failed">Authentication failed</string>
+    <string name="empty_fields">Fill in all fields</string>
+    <string name="existent_account">The account already exists</string>
+    <string name="login_success">Login successful</string>
+    <string name="error">Error, try later</string>
+    <string name="link_account">Account linked successfully</string>
+    <string name="sign_in_google_reason">You must sign in with Google to continue.</string>
+    <string name="pick_image">Pick a image</string>
+    <string name="later">Later</string>
+    <string name="signing_out">Signing out…</string>
+    <string name="feed">News Feed</string>
+    <string name="permission">Permission needed</string>
+    <string name="loading">Loading…</string>
 </resources>

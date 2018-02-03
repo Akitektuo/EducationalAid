@@ -11,10 +11,14 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.activity.MainActivity
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference
+import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_CREATED
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_LANGUAGE
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_SOUND
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.util.*
 
@@ -24,11 +28,13 @@ import java.util.*
 class SettingsFragment : Fragment() {
 
     companion object {
-        val LANGUAGE_EN = "en"
-        val LANGUAGE_RO = "ro"
+        const val LANGUAGE_EN = "en"
+        const val LANGUAGE_RO = "ro"
     }
 
-    private var preference: SettingsPreference? = null
+    private lateinit var preference: SettingsPreference
+    private lateinit var auth: FirebaseAuth
+    private lateinit var alertLoading: AlertDialog
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.fragment_settings, container, false)
@@ -38,25 +44,26 @@ class SettingsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         preference = SettingsPreference(context)
+        auth = FirebaseAuth.getInstance()
 
         textSound.setOnClickListener {
             switchSound.isChecked = !switchSound.isChecked
         }
-        switchSound.isChecked = preference?.getBoolean(KEY_SOUND)!!
+        switchSound.isChecked = preference.getBoolean(KEY_SOUND)!!
         switchSound.setOnCheckedChangeListener({ _, bool ->
-            preference?.set(KEY_SOUND, bool)
+            preference.set(KEY_SOUND, bool)
         })
 
         val builderLanguage = AlertDialog.Builder(context)
         builderLanguage.setTitle(R.string.dialog_language_title)
         builderLanguage.setMessage(R.string.dialog_language_body)
         builderLanguage.setPositiveButton(R.string.yes, { _, _ ->
-            when (preference?.getString(KEY_LANGUAGE)) {
+            when (preference.getString(KEY_LANGUAGE)) {
                 LANGUAGE_EN -> {
-                    preference?.set(KEY_LANGUAGE, LANGUAGE_RO)
+                    preference.set(KEY_LANGUAGE, LANGUAGE_RO)
                 }
                 LANGUAGE_RO -> {
-                    preference?.set(KEY_LANGUAGE, LANGUAGE_EN)
+                    preference.set(KEY_LANGUAGE, LANGUAGE_EN)
                 }
             }
             activity.recreate()
@@ -65,6 +72,23 @@ class SettingsFragment : Fragment() {
         textLanguage.setOnClickListener {
             builderLanguage.show()
         }
+
+        val builder = AlertDialog.Builder(context)
+        builder.setView(R.layout.dialog_load)
+        builder.setTitle(getString(R.string.signing_out))
+        builder.setCancelable(false)
+        alertLoading = builder.create()
+
+        textSignOut.setOnClickListener {
+            auth.signOut()
+            preference.set(KEY_CREATED, false)
+            (activity as MainActivity).signIn()
+        }
+
+    }
+
+    private fun toast(msg: String) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
     class Language(private val context: Context) : ContextWrapper(context) {

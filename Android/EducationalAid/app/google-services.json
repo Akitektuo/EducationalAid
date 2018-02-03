@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "681082361956",
+    "firebase_url": "https://educational-aid.firebaseio.com",
+    "project_id": "educational-aid",
+    "storage_bucket": "educational-aid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681082361956:android:55f1a73837d089af",
+        "android_client_info": {
+          "package_name": "com.akitektuo.educationalaid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "681082361956-2lgj4knnsqnh7ec16p4oeko14i8p28c7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.akitektuo.educationalaid",
+            "certificate_hash": "cf5bee0dda8c43a0883031b46439755bf87ed493"
+          }
+        },
+        {
+          "client_id": "681082361956-tik9ulie16j76gnpk5tncm1pa9k83ltp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlB8q9edcBqr-wxSE2YNi-yD5iGnO2NQA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "681082361956-tik9ulie16j76gnpk5tncm1pa9k83ltp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

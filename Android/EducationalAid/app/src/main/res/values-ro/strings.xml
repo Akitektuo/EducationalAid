@@ -3,7 +3,7 @@
     <string name="app_name">Ajutor de Învățare</string>
     <string name="guest">Vizitator</string>
     <string name="level">Nivelul %1$d</string>
-    <string name="sign_in">Conectați-vă pentru a sincroniza datele</string>
+    <string name="sign_in_to_sync">Conectați-vă pentru a sincroniza datele</string>
     <string name="sign_in_email">Conectare prin email</string>
     <string name="sign_in_google">Conectare prin Google</string>
     <string name="sign_in_facebook">Conectare prin Facebook</string>
@@ -11,7 +11,7 @@
     <string name="change_language">Schimbare limbă</string>
     <string name="edit_profile">Editare profil</string>
     <string name="change_password">Schimbare parola</string>
-    <string name="sign_out_all">Ieșire din toate conturile</string>
+    <string name="sign_out">Deconectare</string>
     <string name="reset">Resetare</string>
     <string name="question">O întrebare</string>
     <string name="questions">%1$d întrebări</string>
@@ -31,4 +31,23 @@
     <string name="dialog_language_body">Schimbați limba din romană în engleză?</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
+    <string name="enter_name">Introduceți numele</string>
+    <string name="connection_needed">Este necesară conexiunea la internet</string>
+    <string name="email">Email</string>
+    <string name="password">Parola</string>
+    <string name="sign_in">Conectare</string>
+    <string name="sign_up">Creare cont</string>
+    <string name="auth_failed">Autentificarea a eșuat</string>
+    <string name="empty_fields">Completați toate câmpurile</string>
+    <string name="existent_account">Contul deja există</string>
+    <string name="login_success">Logare cu succes</string>
+    <string name="error">Eroare, încercați mai târziu</string>
+    <string name="link_account">Contul a fost conectat cu succes</string>
+    <string name="sign_in_google_reason">Pentru a continua trebuie să vă logați folosind Google.</string>
+    <string name="pick_image">Alegeți o imagine</string>
+    <string name="later">Mai târziu</string>
+    <string name="signing_out">Deconectare…</string>
+    <string name="feed">Noutăți</string>
+    <string name="permission">Permisiunea este necesară</string>
+    <string name="loading">Se încarcă…</string>
 </resources>

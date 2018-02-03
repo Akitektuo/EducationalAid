@@ -103,38 +103,6 @@
         app:layout_constraintTop_toBottomOf="@+id/imageEditProfile"
         app:srcCompat="@color/colorSilverLight" />
 
-    <ImageView
-        android:id="@+id/imageChangePassword"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:padding="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageBarEditProfile"
-        app:srcCompat="@drawable/reset_password" />
-
-    <TextView
-        android:id="@+id/textChangePassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/change_password"
-        android:textColor="@color/colorBlack"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageChangePassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageChangePassword"
-        app:layout_constraintTop_toTopOf="@+id/imageChangePassword" />
-
-    <ImageView
-        android:id="@+id/imageBarChangePassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageChangePassword"
-        app:srcCompat="@color/colorSilverLight" />
 
     <ImageView
         android:id="@+id/imageSignOut"
@@ -142,7 +110,7 @@
         android:layout_height="64dp"
         android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageChangePassword"
+        app:layout_constraintTop_toBottomOf="@+id/imageBarEditProfile"
         app:srcCompat="@drawable/sign_out" />
 
     <TextView
@@ -150,13 +118,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:text="@string/sign_out_all"
+        android:text="@string/sign_out"
         android:textColor="@color/colorBlack"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageSignOut"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageSignOut"
-        app:layout_constraintTop_toBottomOf="@+id/imageChangePassword" />
+        app:layout_constraintTop_toTopOf="@+id/imageSignOut" />
 
     <ImageView
         android:id="@+id/imageBarSignOut"
