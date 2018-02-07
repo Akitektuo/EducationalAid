@@ -12,13 +12,11 @@ import com.akitektuo.educationalaid.adapter.ModuleAdapter
 import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
 import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_lesson.*
 
 class LessonActivity : AppCompatActivity() {
 
     private lateinit var database: Database
-    private lateinit var auth: FirebaseAuth
     private lateinit var lessonId: String
 
     override fun attachBaseContext(newBase: Context?) {
@@ -31,7 +29,6 @@ class LessonActivity : AppCompatActivity() {
         buttonBack.setOnClickListener { finish() }
 
         database = Database()
-        auth = FirebaseAuth.getInstance()
 
         listChapters.setHasFixedSize(true)
         listChapters.layoutManager = LinearLayoutManager(this)
@@ -71,7 +68,6 @@ class LessonActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val userId = auth.currentUser?.uid!!
         val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Chapter, ChapterViewHolder>(
                 Database.Chapter::class.java,
                 R.layout.item_chapter,
@@ -81,7 +77,7 @@ class LessonActivity : AppCompatActivity() {
             override fun populateViewHolder(viewHolder: ChapterViewHolder, model: Database.Chapter, position: Int) {
                 viewHolder.makeGone()
                 database.isLessonAvailableForChapter(model.id, lessonId, {
-                    database.getModulesForChapter(userId, model, {
+                    database.getModulesForChapter(model, {
                         viewHolder.bind(ChapterViewHolder.Chapter(this@LessonActivity, model.name, model.status, it.count { it.status != 0 }, it.size, model.image, model.imageLocked, {
                             val intent = Intent(this@LessonActivity, ModuleActivity::class.java)
                             intent.putExtra("key_id", model.id)

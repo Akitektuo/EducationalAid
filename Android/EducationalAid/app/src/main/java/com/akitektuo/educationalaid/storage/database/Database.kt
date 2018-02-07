@@ -695,7 +695,7 @@ class Database {
         })
     }
 
-    fun getModulesForChapter(userId: String, chapter: Chapter, afterResult: (modules: ArrayList<Module>) -> Unit) {
+    fun getModulesForChapter(chapter: Chapter, afterResult: (modules: ArrayList<Module>) -> Unit) {
         databaseModules.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
