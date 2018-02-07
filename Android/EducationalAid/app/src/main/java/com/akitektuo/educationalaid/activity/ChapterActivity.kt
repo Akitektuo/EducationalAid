@@ -21,7 +21,7 @@ class ChapterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chapter)
         buttonBack.setOnClickListener { finish() }
 
-        Toast.makeText(this, "Intent with id ${intent.getIntExtra("key_id", 0)}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Intent with id ${intent.getStringExtra("key_id")}", Toast.LENGTH_SHORT).show()
         textChapterName.text = "CSS3 Basics"
         listModules.layoutManager = LinearLayoutManager(this)
         val moduleModels = ArrayList<ModuleAdapter.ModuleModel>()
