@@ -50,4 +50,7 @@
     <string name="feed">Noutăți</string>
     <string name="permission">Permisiunea este necesară</string>
     <string name="loading">Se încarcă…</string>
+    <string name="edit_name">Editați numele</string>
+    <string name="change_picture">Schimbați poza</string>
+    <string name="save">Salvați</string>
 </resources>

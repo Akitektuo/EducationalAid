@@ -30,14 +30,14 @@ class InfoFragment : Fragment() {
         if ("content".isNullOrEmpty()) {
                 imageContent.visibility = View.GONE
             } else {
-            imageContent.setImageResource(resources.getIdentifier("content", "drawable", context.packageName))
+            imageContent.setImageResource(resources.getIdentifier("content", "drawable", context?.packageName))
             }
         if ("- The offset-x and offset-y values are required for the CSS text-shadow property.\n- The color value is not required, but since the default for the text-shadow is transparent, the text-shadow will not appear unless you specify a color value.".isNullOrEmpty()) {
                 layoutImportant.visibility = View.GONE
             } else {
             textImportant.text = "- The offset-x and offset-y values are required for the CSS text-shadow property.\n- The color value is not required, but since the default for the text-shadow is transparent, the text-shadow will not appear unless you specify a color value."
             }
-        if (bundle.getInt(KEY_ID) == 3) {
+        if (bundle?.getInt(KEY_ID) == 3) {
             imageLocked.visibility = View.VISIBLE
         }
 

@@ -52,4 +52,7 @@
     <string name="feed">News Feed</string>
     <string name="permission">Permission needed</string>
     <string name="loading">Loading…</string>
+    <string name="edit_name">Edit name</string>
+    <string name="change_picture">Change picture</string>
+    <string name="save">Save</string>
 </resources>

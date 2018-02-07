@@ -86,21 +86,21 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        preference = SettingsPreference(context)
+        preference = SettingsPreference(context!!)
 
         val bundle = arguments
 
         with(bundle) {
             textCount.text = getString(R.string.out_of, 1, 2)
             textTask.text = "Add a 25-pixel left and 15-pixel down blue text-shadow."
-            when (getInt(KEY_ID) - 2) {
+            when (this?.getInt(KEY_ID)?.minus(2)) {
                 TYPE_FILL_IN -> decodeForFillIn("p {\ntext-shadow: -_?_25_?_px _?_15_?_px blue;\n}")
                 TYPE_SINGLE_CHOICE -> decodeForSingleChoice("_?_inset\ninner\ninside")
                 TYPE_MULTIPLE_CHOICE -> decodeForMultipleChoice("Horizontal offset\n_?_Spread distance\nVertical offset\n_?_Blur distance")
                 TYPE_DRAG_IN_ORDER -> decodeForDragInOrder("0_?_Horizontal offset\n2_?_Blur\n1_?_Vertical offset\n3_?_Spread\n4_?_Color")
                 TYPE_DRAG_AND_DROP -> decodeForDragAndDrop("_?_#test_?_ _?_p_?_ {\n   color: red;\n}_;_.test_;_#p")
             }
-            if (getInt(KEY_ID) == 0) {
+            if (this?.getInt(KEY_ID) == 0) {
                 imageLocked.visibility = View.VISIBLE
             }
         }
@@ -264,7 +264,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         info.split("\n").shuffled()
                 .map { it.split("_?_") }
                 .mapTo(resultDraggable) { Draggable(it[1], it[0].toInt()) }
-        val adapter = DraggableAdapter(context, resultDraggable, this)
+        val adapter = DraggableAdapter(context!!, resultDraggable, this)
         listDraggable.layoutManager = LinearLayoutManager(context)
         listDraggable.adapter = adapter
         itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adapter))
@@ -410,7 +410,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
             editText.inputType = InputType.TYPE_NULL
             editText.gravity = Gravity.CENTER
             editText.isFocusable = false
-            editText.setTextColor(context.resources.getColor(R.color.colorAccent))
+            editText.setTextColor(context?.resources?.getColor(R.color.colorAccent)!!)
             editText.setOnClickListener {
                 if (editText.text.isNotEmpty()) {
                     layoutDragAndDropKeys.addView(generateDraggableTextView(editText.text.toString()))
@@ -428,7 +428,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     }
 
     private fun buildHint() {
-        val builderHint = AlertDialog.Builder(context)
+        val builderHint = AlertDialog.Builder(context!!)
         builderHint.setTitle(getString(R.string.dialog_hint_title))
         builderHint.setMessage(getString(R.string.dialog_hint_body, 258))
         builderHint.setPositiveButton("Ok", { _, _ ->
@@ -466,7 +466,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     private fun buildUnlock() {
         layoutUnlock.setOnClickListener {
-            val builderUnlock = AlertDialog.Builder(context)
+            val builderUnlock = AlertDialog.Builder(context!!)
             builderUnlock.setTitle(getString(R.string.dialog_unlock_title))
             builderUnlock.setMessage(getString(R.string.dialog_unlock_body, 258))
             builderUnlock.setPositiveButton("Ok", onUnlock)
