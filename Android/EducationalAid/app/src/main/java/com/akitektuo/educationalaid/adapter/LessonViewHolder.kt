@@ -3,6 +3,8 @@ package com.akitektuo.educationalaid.adapter
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -23,6 +25,10 @@ class LessonViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     private val progressCount = view.findViewById<ProgressBar>(R.id.progressCount)
     private val textProgress = view.findViewById<TextView>(R.id.textProgress)
 
+    fun makeGone() {
+        view.visibility = GONE
+    }
+
     fun bind(lesson: Lesson) = with(lesson) {
         textTitle.text = title
         Picasso.with(context).load(image).into(imageLesson)
@@ -33,7 +39,7 @@ class LessonViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         view.setOnClickListener {
             onClick()
         }
-
+        view.visibility = VISIBLE
     }
 
 }

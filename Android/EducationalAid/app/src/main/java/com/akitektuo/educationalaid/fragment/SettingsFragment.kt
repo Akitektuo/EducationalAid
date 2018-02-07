@@ -92,6 +92,8 @@ class SettingsFragment : Fragment() {
         val database = Database()
         textReset.setOnClickListener {
             val userId = auth.currentUser?.uid!!
+            val lessonId = "-L4a3Y_JbW4ipgxjhhq8"
+            database.addUserLesson(Database.UserLesson(userId, lessonId, true, true))
 //            val moduleId = "-L4a3Y_jPrig_Tm9SW-z"
 //
 //            val info1 = database.addInfo(Database.Info("The HTML File", "HTML files are text files, so you can use any text editor to create your first webpage. \n" +

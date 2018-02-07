@@ -40,7 +40,7 @@ class LearnFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        val userId = auth.currentUser?.uid
+        val userId = auth.currentUser?.uid!!
         val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Lesson, LessonViewHolder>(
                 Database.Lesson::class.java,
                 R.layout.item_lesson,
@@ -48,17 +48,27 @@ class LearnFragment : Fragment() {
                 database.databaseLessons
         ) {
             override fun populateViewHolder(viewHolder: LessonViewHolder, model: Database.Lesson, position: Int) {
-                database.getUserMIQForLesson(userId!!, model, {
-                    var progress = 0
-                    if (model.started) {
-                        progress = it.count { !it.locked }
-                    }
-                    viewHolder.bind(LessonViewHolder.Lesson(activity?.applicationContext!!, model.name, model.image, progress, it.size, {
-                        val intent = Intent(context, LessonActivity::class.java)
-                        intent.putExtra("key_id", model.id)
-                        startActivity(intent)
-                    }))
-                })
+                viewHolder.makeGone()
+                if (model.visibility != 0) {
+                    database.isLessonAvailableForUser(userId, model.id, {
+                        val isPaid = it
+                        database.getUserMIQForLesson(userId, model, {
+                            var progress = 0
+                            if (model.started) {
+                                progress = it.count { !it.locked }
+                            }
+                            viewHolder.bind(LessonViewHolder.Lesson(activity?.applicationContext!!, model.name, model.image, progress, it.size, {
+                                if (isPaid) {
+                                    val intent = Intent(context, LessonActivity::class.java)
+                                    intent.putExtra("key_id", model.id)
+                                    startActivity(intent)
+                                } else {
+                                    toast("Buying lessons will be implemented in other versions")
+                                }
+                            }))
+                        })
+                    })
+                }
             }
         }
         listLessons.adapter = firebaseAdapter

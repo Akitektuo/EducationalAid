@@ -27,13 +27,14 @@ class Database {
             var image: String = "",
             val level: Int = 1,
             val currentXp: Int = 0,
-            val isAdmin: Boolean = false,
+            val admin: Boolean = false,
             var id: String = "")
 
     data class UserLesson(
             val userId: String = "",
             val lessonId: String = "",
-            val isAdmin: Boolean = false,
+            val admin: Boolean = false,
+            val paid: Boolean = false,
             var id: String = "")
 
     /**
@@ -333,6 +334,39 @@ class Database {
                     it.getValue<UserFollower>(UserFollower::class.java)
                 })
                 afterResult(usersFollowers.filter { it.userId == user.id } as ArrayList<UserFollower>)
+            }
+        })
+    }
+
+    fun isLessonAvailableForUser(userId: String, lessonId: String, afterResult: (paid: Boolean) -> Unit) {
+        databaseUsersLessons.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersLessons = ArrayList<UserLesson>()
+                data?.children?.mapNotNullTo(usersLessons, {
+                    it.getValue(UserLesson::class.java)
+                })
+                usersLessons.filter { it.userId == userId && it.lessonId == lessonId }
+                        .forEach { afterResult(it.paid || it.admin) }
+
+            }
+        })
+    }
+
+    fun isLessonAvailableForChapter(chapterId: String, lessonId: String, afterResult: () -> Unit) {
+        databaseChapters.child(chapterId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val chapter = data?.getValue(Chapter::class.java)
+                if (chapter?.lessonId == lessonId) {
+                    afterResult()
+                }
             }
         })
     }
@@ -657,6 +691,23 @@ class Database {
                         })
                     }
                 })
+            }
+        })
+    }
+
+    fun getModulesForChapter(userId: String, chapter: Chapter, afterResult: (modules: ArrayList<Module>) -> Unit) {
+        databaseModules.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val modules = ArrayList<Module>()
+                data?.children?.mapNotNullTo(modules, { it.getValue(Module::class.java) })
+                modules.filter { chapter.id != it.chapterId }
+                        .sortedBy { it.position }
+                        .forEach { modules.remove(it) }
+                afterResult(modules)
             }
         })
     }

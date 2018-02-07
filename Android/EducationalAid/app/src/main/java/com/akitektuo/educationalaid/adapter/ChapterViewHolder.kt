@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -21,6 +23,10 @@ class ChapterViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     private val imageChapter = view.findViewById<ImageView>(R.id.imageChapter)
 
     data class Chapter(val context: Context, val name: String, val status: Int, val count: Int, val total: Int, val image: String, val imageLocked: String, val onClick: () -> Unit)
+
+    fun makeGone() {
+        view.visibility = GONE
+    }
 
     fun bind(chapter: Chapter) = with(chapter) {
         textChapter.text = name
@@ -49,6 +55,11 @@ class ChapterViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
                 Picasso.with(context).load(image).into(imageChapter)
             }
         }
+        imageChapter.background = drawableBackground
+        view.setOnClickListener {
+            onClick()
+        }
+        view.visibility = VISIBLE
     }
 
 }

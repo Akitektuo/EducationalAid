@@ -26,7 +26,7 @@ class ModuleActivity : AppCompatActivity(), Fragment.OnClickContinue {
         setContentView(R.layout.activity_module)
 
         buttonBack.setOnClickListener { finish() }
-        Toast.makeText(this, "Intent with id ${intent.getIntExtra("key_id", 0)}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Intent with id ${intent.getStringExtra("key_id")}", Toast.LENGTH_SHORT).show()
         textModuleName.text = "text-shadow"
 
         val fragments = ArrayList<PagerAdapter.TabFragment>()
