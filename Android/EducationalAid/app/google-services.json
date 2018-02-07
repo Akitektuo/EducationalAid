@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "681082361956-sq5mm1ft71tder5prbdp2c3kptkh5e0b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.akitektuo.educationalaid",
+            "certificate_hash": "41300d6418200c5999767a4ebdaf9988ca48000e"
+          }
+        },
+        {
           "client_id": "681082361956-2lgj4knnsqnh7ec16p4oeko14i8p28c7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

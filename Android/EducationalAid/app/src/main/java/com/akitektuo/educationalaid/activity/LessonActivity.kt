@@ -6,11 +6,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.ChapterAdapter
-import com.akitektuo.educationalaid.adapter.ChapterViewHolder
 import com.akitektuo.educationalaid.adapter.ModuleAdapter
 import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
-import com.firebase.ui.database.FirebaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_lesson.*
 
 class LessonActivity : AppCompatActivity() {
@@ -25,6 +23,8 @@ class LessonActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lesson)
         buttonBack.setOnClickListener { finish() }
+
+        database = Database()
 
         listChapters.setHasFixedSize(true)
         listChapters.layoutManager = LinearLayoutManager(this)
@@ -61,23 +61,4 @@ class LessonActivity : AppCompatActivity() {
         listChapters.adapter = ChapterAdapter(this, chapterModels)
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        database.getLesson(intent.getStringExtra("key_id"), {
-            val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Chapter, ChapterViewHolder>(
-                    Database.Chapter::class.java,
-                    R.layout.item_chapter,
-                    ChapterViewHolder::class.java,
-                    database.databaseChapters
-            ) {
-                override fun populateViewHolder(viewHolder: ChapterViewHolder?, model: Database.Chapter?, position: Int) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-
-            }
-            listChapters.adapter = firebaseAdapter
-        })
-
-    }
 }
