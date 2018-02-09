@@ -56,8 +56,10 @@ class ChapterViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             }
         }
         imageChapter.background = drawableBackground
-        view.setOnClickListener {
-            onClick()
+        if (status != 0) {
+            view.setOnClickListener {
+                onClick()
+            }
         }
         view.visibility = VISIBLE
     }

@@ -1,16 +1,23 @@
 package com.akitektuo.educationalaid.activity
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.widget.Toast
 import com.akitektuo.educationalaid.R
-import com.akitektuo.educationalaid.adapter.ModuleAdapter
+import com.akitektuo.educationalaid.adapter.ModuleViewHolder
 import com.akitektuo.educationalaid.fragment.SettingsFragment
+import com.akitektuo.educationalaid.storage.database.Database
+import com.firebase.ui.database.FirebaseRecyclerAdapter
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_chapter.*
 
 class ChapterActivity : AppCompatActivity() {
+
+    private lateinit var database: Database
+    private lateinit var chapterId: String
+    private lateinit var auth: FirebaseAuth
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(SettingsFragment.Language(newBase!!).wrap())
@@ -21,22 +28,46 @@ class ChapterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chapter)
         buttonBack.setOnClickListener { finish() }
 
-        Toast.makeText(this, "Intent with id ${intent.getStringExtra("key_id")}", Toast.LENGTH_SHORT).show()
-        textChapterName.text = "CSS3 Basics"
+        database = Database()
+        auth = FirebaseAuth.getInstance()
+        chapterId = intent.getStringExtra("key_id")
+
+        listModules.setHasFixedSize(true)
         listModules.layoutManager = LinearLayoutManager(this)
-        val moduleModels = ArrayList<ModuleAdapter.ModuleModel>()
-        moduleModels.add(ModuleAdapter.ModuleModel(1, 1, "Introduction to CSS3", 3, 2))
-        moduleModels.add(ModuleAdapter.ModuleModel(2, 2, "Vendor Prefixes", 2, 2))
-        moduleModels.add(ModuleAdapter.ModuleModel(3, 3, "Rounded Corners", 2, 2))
-        moduleModels.add(ModuleAdapter.ModuleModel(4, 4, "box-shadow", 3, 2))
-        moduleModels.add(ModuleAdapter.ModuleModel(5, 5, "Box Shadow Techniques", 2, 2))
-        moduleModels.add(ModuleAdapter.ModuleModel(6, 6, "Transparency Effect", 1, 2))
-        moduleModels.add(ModuleAdapter.ModuleModel(7, 7, "text-shadow", 2, 1))
-        moduleModels.add(ModuleAdapter.ModuleModel(8, 8, "Pseudo Classes", 1, 0))
-        moduleModels.add(ModuleAdapter.ModuleModel(9, 9, "Pseudo Elements", 2, 0))
-        moduleModels.add(ModuleAdapter.ModuleModel(10, 10, "word-wrap", 1, 0))
-        moduleModels.add(ModuleAdapter.ModuleModel(11, 11, "@font-face", 2, 0))
-        moduleModels.add(ModuleAdapter.ModuleModel(12, 12, "Module 5 Quiz", 4, 0))
-        listModules.adapter = ModuleAdapter(this, moduleModels)
+
+        database.getChapter(chapterId, {
+            textChapterName.text = it.name
+        })
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        database.getModuleAll(chapterId, {
+            val total = it.size
+            val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Module, ModuleViewHolder>(
+                    Database.Module::class.java,
+                    R.layout.item_module,
+                    ModuleViewHolder::class.java,
+                    database.databaseModules
+            ) {
+                override fun populateViewHolder(viewHolder: ModuleViewHolder, model: Database.Module, position: Int) {
+                    viewHolder.makeGone()
+                    database.isModuleAvailableForChapter(model.id, chapterId, {
+                        database.getUserStatus(auth.currentUser?.uid!!, model.id, {
+                            val status = it.status
+                            database.getUserMIQAll(auth.currentUser?.uid!!, model.id, {
+                                viewHolder.bind(ModuleViewHolder.Module(this@ChapterActivity, model.position, total, model.name, it.count { it.question }, status, {
+                                    val intent = Intent(this@ChapterActivity, ModuleActivity::class.java)
+                                    intent.putExtra("key_id", model.id)
+                                    startActivity(intent)
+                                }))
+                            })
+                        })
+                    })
+                }
+            }
+            listModules.adapter = firebaseAdapter
+        })
     }
 }

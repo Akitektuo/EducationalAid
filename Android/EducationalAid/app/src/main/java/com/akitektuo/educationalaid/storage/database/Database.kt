@@ -73,6 +73,12 @@ class Database {
             var price: Double = 0.0,
             var id: String = "")
 
+    data class UserStatus(
+            val userId: String = "",
+            val statusId: String = "",
+            val status: Int = 0,
+            var id: String = "")
+
     /**
      * @property status
      * 0 -> locked
@@ -85,7 +91,6 @@ class Database {
             var image: String = "",
             var imageLocked: String = "",
             val position: Int = 0,
-            val status: Int = 0,
             var id: String = "")
 
     /**
@@ -98,7 +103,6 @@ class Database {
             val chapterId: String = "",
             val name: String = "",
             val position: Int = 0,
-            val status: Int = 0,
             var id: String = "")
 
     data class UserMIQ(
@@ -108,7 +112,7 @@ class Database {
             val infoId: String = "",
             val question: Boolean = false,
             val position: Int = 0,
-            val locked: Boolean = true,
+            var locked: Boolean = true,
             var id: String = "")
 
     data class Info(
@@ -129,6 +133,7 @@ class Database {
     data class Question(
             val task: String = "",
             val solving: String = "",
+            val position: Int = 0,
             val type: Int = 0,
             var id: String = "")
 
@@ -139,6 +144,7 @@ class Database {
     val databaseLessons = database.child("Lessons")!!
     val databaseChapters = database.child("Chapters")
     val databaseModules = database.child("Modules")
+    val databaseUsersStatus = database.child("UsersStatus")
     private val databaseUsersMsIsQs = database.child("ModulesIsQs")
     private val databaseInfos = database.child("Infos")
     private val databaseQuestions = database.child("Questions")
@@ -165,6 +171,28 @@ class Database {
             }
         }
 
+    }
+
+    fun addUserStatus(userStatus: UserStatus) {
+        if (userStatus.id.isEmpty()) {
+            userStatus.id = databaseUsersStatus.push().key
+        }
+        databaseUsersStatus.child(userStatus.id).setValue(userStatus)
+    }
+
+    fun getUserStatus(userId: String, statusId: String, afterResult: (userStatus: UserStatus) -> Unit) {
+        databaseUsersStatus.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersStatus = ArrayList<UserStatus>()
+                data?.children?.mapNotNullTo(usersStatus, { it.getValue(UserStatus::class.java) })
+                usersStatus.filter { it.userId != userId || it.statusId != statusId }.forEach { usersStatus.remove(it) }
+                afterResult(usersStatus[0])
+            }
+        })
     }
 
     fun editUser(user: User, onCompleteListener: (task: Task<Void>, user: User) -> Unit, image: Uri? = null) {
@@ -356,7 +384,7 @@ class Database {
         })
     }
 
-    fun isLessonAvailableForChapter(chapterId: String, lessonId: String, afterResult: () -> Unit) {
+    fun isChapterAvailableForLesson(chapterId: String, lessonId: String, afterResult: () -> Unit) {
         databaseChapters.child(chapterId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
@@ -365,6 +393,21 @@ class Database {
             override fun onDataChange(data: DataSnapshot?) {
                 val chapter = data?.getValue(Chapter::class.java)
                 if (chapter?.lessonId == lessonId) {
+                    afterResult()
+                }
+            }
+        })
+    }
+
+    fun isModuleAvailableForChapter(moduleId: String, chapterId: String, afterResult: () -> Unit) {
+        databaseModules.child(moduleId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val module = data?.getValue(Module::class.java)
+                if (module?.chapterId == chapterId) {
                     afterResult()
                 }
             }
@@ -482,7 +525,7 @@ class Database {
         })
     }
 
-    fun getModuleAll(chapter: Chapter, afterResult: (modules: ArrayList<Module>) -> Unit) {
+    fun getModuleAll(chapterId: String, afterResult: (modules: ArrayList<Module>) -> Unit) {
         databaseModules.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
@@ -493,7 +536,8 @@ class Database {
                 data?.children?.mapNotNullTo(modules, {
                     it.getValue<Module>(Module::class.java)
                 })
-                afterResult(modules.filter { it.chapterId == chapter.id }.sortedBy { it.position } as ArrayList<Module>)
+                modules.filter { it.chapterId != chapterId }.sortedBy { it.position }.forEach { modules.remove(it) }
+                afterResult(modules)
             }
         })
     }
@@ -634,7 +678,7 @@ class Database {
         })
     }
 
-    fun getUserMIQAll(user: User, module: Module, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
+    fun getUserMIQAll(userId: String, moduleId: String, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
         databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
@@ -645,7 +689,8 @@ class Database {
                 data?.children?.mapNotNullTo(usersMsIsQs, {
                     it.getValue<UserMIQ>(UserMIQ::class.java)
                 })
-                afterResult(usersMsIsQs.filter { it.userId == user.id && it.moduleId == module.id }.sortedBy { it.position } as ArrayList<UserMIQ>)
+                usersMsIsQs.filter { it.userId != userId || it.moduleId != moduleId }.sortedBy { it.position }.forEach { usersMsIsQs.remove(it) }
+                afterResult(usersMsIsQs)
             }
         })
     }
@@ -666,12 +711,13 @@ class Database {
                     }
 
                     override fun onDataChange(data: DataSnapshot?) {
+                        val modulesTemp = ArrayList<Module>()
                         val modules = ArrayList<Module>()
-                        data?.children?.mapNotNullTo(modules, { it.getValue(Module::class.java) })
+                        data?.children?.mapNotNullTo(modulesTemp, { it.getValue(Module::class.java) })
                         for (chapter in chapters) {
-                            modules.filter { chapter.id != it.chapterId }
+                            modulesTemp.filter { chapter.id == it.chapterId }
                                     .sortedBy { it.position }
-                                    .forEach { modules.remove(it) }
+                                    .forEach { modules.add(it) }
                         }
                         databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(error: DatabaseError?) {
@@ -679,18 +725,34 @@ class Database {
                             }
 
                             override fun onDataChange(data: DataSnapshot?) {
+                                val usersMsIsQsTemp = ArrayList<UserMIQ>()
                                 val usersMsIsQs = ArrayList<UserMIQ>()
-                                data?.children?.mapNotNullTo(usersMsIsQs, { it.getValue(UserMIQ::class.java) })
+                                data?.children?.mapNotNullTo(usersMsIsQsTemp, { it.getValue(UserMIQ::class.java) })
                                 for (module in modules) {
-                                    usersMsIsQs.filter { module.id != it.moduleId || it.userId != userId }
+                                    usersMsIsQsTemp.filter { module.id != it.moduleId || it.userId != userId }
                                             .sortedBy { it.position }
-                                            .forEach { usersMsIsQs.remove(it) }
+                                            .forEach { usersMsIsQs.add(it) }
                                 }
                                 afterResult(usersMsIsQs)
                             }
                         })
                     }
                 })
+            }
+        })
+    }
+
+    fun getUserMIQForInfo(userId: String, infoId: String, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
+        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersMsIsQs = ArrayList<UserMIQ>()
+                data?.children?.mapNotNullTo(usersMsIsQs, { it.getValue(UserMIQ::class.java) })
+                usersMsIsQs.filter { it.userId != userId || it.infoId != infoId }.sortedBy { it.position }.forEach { usersMsIsQs.remove(it) }
+                afterResult(usersMsIsQs)
             }
         })
     }
@@ -709,6 +771,32 @@ class Database {
                         .forEach { modules.remove(it) }
                 afterResult(modules)
             }
+        })
+    }
+
+    fun unlockNext(userId: String, userMIQId: String, afterResult: () -> Unit) {
+        getUserMIQ(userMIQId, {
+            getModule(it.moduleId, {
+                val currentModule = it
+                getChapter(currentModule.chapterId, {
+                    val currentChapter = it
+                    getModuleAll(currentChapter.id, {
+                        if (currentModule.position == it.size) {
+                            getLesson(currentChapter.lessonId, {
+                                getChaterAll(it, {
+                                    //edit current chapter to finished
+                                    getUserStatus(userId, currentChapter.id, {})
+                                    if (currentChapter.position < it.size) {
+
+                                    }
+                                })
+                            })
+                        } else {
+                            //unlock it[currentModule.position]
+                        }
+                    })
+                })
+            })
         })
     }
 

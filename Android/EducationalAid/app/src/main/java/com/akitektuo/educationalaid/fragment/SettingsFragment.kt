@@ -24,8 +24,12 @@ import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Compan
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_LANGUAGE
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_SOUND
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by Akitektuo on 31.12.2017.
@@ -123,6 +127,30 @@ class SettingsFragment : Fragment() {
 //            val chapter2 = database.addChapter(Database.Chapter(lessonId, "HTML Basics", "https://png.icons8.com/ios/256/ffffff/web.png", "https://png.icons8.com/ios/256/A6A6A6/web.png", 2))
 //            val chapter3 = database.addChapter(Database.Chapter(lessonId, "Challenges", "https://png.icons8.com/ios/256/ffffff/trophy.png", "https://png.icons8.com/ios/256/A6A6A6/trophy.png", 3))
 //            val chapter4 = database.addChapter(Database.Chapter(lessonId, "HTML5", "https://png.icons8.com/ios/256/ffffff/html-5.png", "https://png.icons8.com/ios/256/A6A6A6/html-5.png", 4))
+
+            database.databaseChapters.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError?) {
+
+                }
+
+                override fun onDataChange(data: DataSnapshot?) {
+                    val chapters = ArrayList<Database.Chapter>()
+                    data?.children?.mapNotNullTo(chapters, { it.getValue(Database.Chapter::class.java) })
+                    chapters.forEach { database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, it.id)) }
+                }
+            })
+
+            database.databaseModules.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError?) {
+
+                }
+
+                override fun onDataChange(data: DataSnapshot?) {
+                    val modules = ArrayList<Database.Module>()
+                    data?.children?.mapNotNullTo(modules, { it.getValue(Database.Module::class.java) })
+                    modules.forEach { database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, it.id)) }
+                }
+            })
 
         }
 

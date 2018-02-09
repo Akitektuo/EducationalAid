@@ -8,6 +8,8 @@ import android.view.inputmethod.InputMethodManager
 import com.akitektuo.educationalaid.adapter.PagerAdapter
 import com.akitektuo.educationalaid.fragment.InfoFragment
 import com.akitektuo.educationalaid.fragment.QuestionFragment
+import com.akitektuo.educationalaid.storage.database.Database
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * Created by Akitektuo on 03.01.2018.
@@ -37,6 +39,9 @@ class TabbedPagerComponent(
             getTabAt(startingPage)?.select()
         }
     }
+
+    private val database = Database()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onTabReselected(tab: TabLayout.Tab?) {
     }
@@ -70,10 +75,13 @@ class TabbedPagerComponent(
     override fun onPageSelected(position: Int) {
     }
 
-    fun nextFragment() {
+    fun nextFragment(idUMIQ: String) {
         val position = tab.selectedTabPosition + 1
         if (position == fragments.size) {
-            activity.finish()
+            //TODO unlock next part
+            database.unlockNext(auth.currentUser?.uid!!, idUMIQ, {
+                activity.finish()
+            })
         } else {
             with(fragments[position]) {
                 locked = false

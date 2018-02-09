@@ -20,10 +20,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.activity.ModuleActivity
 import com.akitektuo.educationalaid.adapter.DraggableAdapter
+import com.akitektuo.educationalaid.storage.database.Database
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_SOUND
 import com.akitektuo.educationalaid.util.ItemTouchHelperCallback
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_question.*
 
 /**
@@ -34,6 +37,9 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     companion object {
         const val KEY_ID = "key_id"
+        const val KEY_LOCKED = "key_locked"
+        const val KEY_ID_UMIQ = "key_umiq"
+        const val KEY_TOTAL = "key_total"
 
         const val TYPE_FILL_IN = 0
         const val TYPE_SINGLE_CHOICE = 1
@@ -51,6 +57,9 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     private var onUnlock = { _: DialogInterface, _: Int -> }
     private lateinit var itemTouchHelper: ItemTouchHelper
     private lateinit var preference: SettingsPreference
+    private lateinit var database: Database
+    private lateinit var auth: FirebaseAuth
+    private lateinit var userMIQId: String
 
     private data class FillIn(val editText: EditText, val text: String, var nextFocus: EditText? = null) : TextWatcher {
 
@@ -87,23 +96,41 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         super.onActivityCreated(savedInstanceState)
 
         preference = SettingsPreference(context!!)
+        database = Database()
+        auth = FirebaseAuth.getInstance()
 
         val bundle = arguments
 
-        with(bundle) {
-            textCount.text = getString(R.string.out_of, 1, 2)
-            textTask.text = "Add a 25-pixel left and 15-pixel down blue text-shadow."
-            when (this?.getInt(KEY_ID)?.minus(2)) {
-                TYPE_FILL_IN -> decodeForFillIn("p {\ntext-shadow: -_?_25_?_px _?_15_?_px blue;\n}")
-                TYPE_SINGLE_CHOICE -> decodeForSingleChoice("_?_inset\ninner\ninside")
-                TYPE_MULTIPLE_CHOICE -> decodeForMultipleChoice("Horizontal offset\n_?_Spread distance\nVertical offset\n_?_Blur distance")
-                TYPE_DRAG_IN_ORDER -> decodeForDragInOrder("0_?_Horizontal offset\n2_?_Blur\n1_?_Vertical offset\n3_?_Spread\n4_?_Color")
-                TYPE_DRAG_AND_DROP -> decodeForDragAndDrop("_?_#test_?_ _?_p_?_ {\n   color: red;\n}_;_.test_;_#p")
+        userMIQId = bundle?.getString(KEY_ID_UMIQ)!!
+        database.getQuestion(bundle.getString(KEY_ID)!!, {
+            textCount.text = getString(R.string.out_of, it.position, bundle.getInt(KEY_TOTAL))
+            textTask.text = it.task
+            when (it.type) {
+                TYPE_FILL_IN -> decodeForFillIn(it.solving)
+                TYPE_SINGLE_CHOICE -> decodeForSingleChoice(it.solving)
+                TYPE_MULTIPLE_CHOICE -> decodeForMultipleChoice(it.solving)
+                TYPE_DRAG_IN_ORDER -> decodeForDragInOrder(it.solving)
+                TYPE_DRAG_AND_DROP -> decodeForDragAndDrop(it.solving)
             }
-            if (this?.getInt(KEY_ID) == 0) {
+            if (bundle.getBoolean(KEY_LOCKED)) {
                 imageLocked.visibility = View.VISIBLE
             }
-        }
+        })
+
+//        with(bundle) {
+//            textCount.text = getString(R.string.out_of, 1, 2)
+//            textTask.text = "Add a 25-pixel left and 15-pixel down blue text-shadow."
+//            when (this?.getInt(KEY_ID)?.minus(2)) {
+//                TYPE_FILL_IN -> decodeForFillIn("p {\ntext-shadow: -_?_25_?_px _?_15_?_px blue;\n}")
+//                TYPE_SINGLE_CHOICE -> decodeForSingleChoice("_?_inset\ninner\ninside")
+//                TYPE_MULTIPLE_CHOICE -> decodeForMultipleChoice("Horizontal offset\n_?_Spread distance\nVertical offset\n_?_Blur distance")
+//                TYPE_DRAG_IN_ORDER -> decodeForDragInOrder("0_?_Horizontal offset\n2_?_Blur\n1_?_Vertical offset\n3_?_Spread\n4_?_Color")
+//                TYPE_DRAG_AND_DROP -> decodeForDragAndDrop("_?_#test_?_ _?_p_?_ {\n   color: red;\n}_;_.test_;_#p")
+//            }
+//            if (this?.getInt(KEY_ID) == 0) {
+//                imageLocked.visibility = View.VISIBLE
+//            }
+//        }
 
         buildUnlock()
     }
@@ -171,7 +198,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     layoutFillIn.removeAllViews()
-                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                    (activity as ModuleActivity).continueOnClick(userMIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForFillIn(info)
@@ -210,7 +237,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForSingleChoice(info)
-                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                    (activity as ModuleActivity).continueOnClick(userMIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForSingleChoice(info)
@@ -248,7 +275,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForMultipleChoice(info)
-                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                    (activity as ModuleActivity).continueOnClick(userMIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForMultipleChoice(info)
@@ -299,7 +326,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForDragInOrder(info)
-                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                    (activity as ModuleActivity).continueOnClick(userMIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForDragInOrder(info)
@@ -379,7 +406,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForDragAndDrop(info)
-                    (activity as com.akitektuo.educationalaid.notifier.Fragment.OnClickContinue).continueOnClick()
+                    (activity as ModuleActivity).continueOnClick(userMIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForDragAndDrop(info)
@@ -425,6 +452,10 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     fun unlockFragment() {
         imageLocked.visibility = View.GONE
+        database.getUserMIQ(userMIQId, {
+            it.locked = false
+            database.editUserMIQ(it)
+        })
     }
 
     private fun buildHint() {

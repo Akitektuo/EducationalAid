@@ -3,19 +3,26 @@ package com.akitektuo.educationalaid.activity
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.PagerAdapter
 import com.akitektuo.educationalaid.component.TabbedPagerComponent
 import com.akitektuo.educationalaid.fragment.InfoFragment
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_ID
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_ID_UMIQ
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_LOCKED
 import com.akitektuo.educationalaid.fragment.QuestionFragment
+import com.akitektuo.educationalaid.fragment.QuestionFragment.Companion.KEY_TOTAL
 import com.akitektuo.educationalaid.fragment.SettingsFragment
-import com.akitektuo.educationalaid.notifier.Fragment
+import com.akitektuo.educationalaid.storage.database.Database
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_module.*
 
-class ModuleActivity : AppCompatActivity(), Fragment.OnClickContinue {
+class ModuleActivity : AppCompatActivity() {
 
-    private var tabbedPager: TabbedPagerComponent? = null
+    private lateinit var tabbedPager: TabbedPagerComponent
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: Database
+    private lateinit var moduleId: String
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(SettingsFragment.Language(newBase!!).wrap())
@@ -24,35 +31,64 @@ class ModuleActivity : AppCompatActivity(), Fragment.OnClickContinue {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_module)
-
         buttonBack.setOnClickListener { finish() }
-        Toast.makeText(this, "Intent with id ${intent.getStringExtra("key_id")}", Toast.LENGTH_SHORT).show()
-        textModuleName.text = "text-shadow"
+
+        auth = FirebaseAuth.getInstance()
+        database = Database()
+        moduleId = intent.getStringExtra("key_id")
+
+        database.getModule(moduleId, {
+            textModuleName.text = it.name
+        })
 
         val fragments = ArrayList<PagerAdapter.TabFragment>()
-        for (i in 0..5) {
-            val fragmentInfo = InfoFragment()
-            val argumentsInfo = Bundle()
-            argumentsInfo.putInt(InfoFragment.KEY_ID, i + 1)
-            fragmentInfo.arguments = argumentsInfo
-            val fragmentQuestion = QuestionFragment()
-            val argumentsQuestion = Bundle()
-            argumentsQuestion.putInt(QuestionFragment.KEY_ID, i + 1)
-            fragmentQuestion.arguments = argumentsQuestion
-            when (i) {
-                0 -> fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected))
-                1 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
-                2 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
-                3 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
-                4 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
-                5 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+
+        database.getUserMIQAll(auth.currentUser?.uid!!, moduleId, {
+            val questions = it.count { it.question }
+            it.forEach {
+                val arguments = Bundle()
+                if (it.question) {
+                    val fragmentQuestion = QuestionFragment()
+                    arguments.putString(KEY_ID, it.questionId)
+                    arguments.putBoolean(KEY_LOCKED, it.locked)
+                    arguments.putString(KEY_ID_UMIQ, it.id)
+                    arguments.putInt(KEY_TOTAL, questions)
+                    fragmentQuestion.arguments = arguments
+                    fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected, R.drawable.question_silver, it.locked))
+                } else {
+                    val fragmentInfo = InfoFragment()
+                    arguments.putString(KEY_ID, it.infoId)
+                    arguments.putBoolean(KEY_LOCKED, it.locked)
+                    arguments.putString(KEY_ID_UMIQ, it.id)
+                    fragmentInfo.arguments = arguments
+                    fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected, R.drawable.book_silver, it.locked))
+                }
             }
-        }
-        tabbedPager = TabbedPagerComponent(this, pager, tab, fragments)
+            tabbedPager = TabbedPagerComponent(this, pager, tab, fragments)
+        })
+//
+//        for (i in 0..5) {
+//            val fragmentInfo = InfoFragment()
+//            val argumentsInfo = Bundle()
+//            argumentsInfo.putInt(InfoFragment.KEY_ID, i + 1)
+//            fragmentInfo.arguments = argumentsInfo
+//            val fragmentQuestion = QuestionFragment()
+//            val argumentsQuestion = Bundle()
+//            argumentsQuestion.putInt(QuestionFragment.KEY_ID, i + 1)
+//            fragmentQuestion.arguments = argumentsQuestion
+//            when (i) {
+//                0 -> fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected))
+//                1 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+//                2 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+//                3 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+//                4 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+//                5 -> fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected))
+//            }
+//        }
     }
 
-    override fun continueOnClick() {
-        tabbedPager?.nextFragment()
+    fun continueOnClick(idUMIQ: String) {
+        tabbedPager.nextFragment(idUMIQ)
     }
 
 }
