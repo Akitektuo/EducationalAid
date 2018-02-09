@@ -107,6 +107,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressLevel" />
 
+    <TextView
+        android:id="@+id/textFindPeople"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:text="@string/find_people"
+        android:textAllCaps="true"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/textContentDescription"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/textContentDescription"
+        app:layout_constraintTop_toTopOf="@+id/textContentDescription" />
+
     <ImageView
         android:id="@+id/imageBarContent"
         android:layout_width="0dp"

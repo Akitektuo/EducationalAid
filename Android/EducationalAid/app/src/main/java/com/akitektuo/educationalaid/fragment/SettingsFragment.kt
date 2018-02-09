@@ -24,12 +24,8 @@ import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Compan
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_LANGUAGE
 import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Companion.KEY_SOUND
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Created by Akitektuo on 31.12.2017.
@@ -94,64 +90,63 @@ class SettingsFragment : Fragment() {
         }
 
         val database = Database()
+        val userId = auth.currentUser?.uid!!
         textReset.setOnClickListener {
-            val userId = auth.currentUser?.uid!!
-            val lessonId = "-L4a3Y_JbW4ipgxjhhq8"
-            database.addUserLesson(Database.UserLesson(userId, lessonId, true, true))
-//            val moduleId = "-L4a3Y_jPrig_Tm9SW-z"
-//
-//            val info1 = database.addInfo(Database.Info("The HTML File", "HTML files are text files, so you can use any text editor to create your first webpage. \n" +
-//                    "There are some very nice HTML editors available; you can choose the one that works for you. For now let's write our examples in Notepad.",
-//                    "https://api.sololearn.com/DownloadFile?id=2466", "You can run, save, and share your HTML codes on our Code Playground, without installing any additional software."))
-//            database.addUserMIQ(Database.UserMIQ(userId, moduleId, "", info1, false, 1))
-//            val question2 = database.addQuestion(Database.Question("What type of editor is used to edit HTML code?", "_?_text_?_ editor", 0))
-//            database.addUserMIQ(Database.UserMIQ(userId, moduleId, question2, "", true, 2))
-//            val info3 = database.addInfo(Database.Info("The HTML File", "Add the basic HTML structure to the text editor with \"This is a line of text\" in the body section.\n\n" +
-//                    "<html>\n   <head>\n   </head>\n   <body>\n      This is a line of text. \n   </body>\n</html>\n\nIn our example, the file is saved as first.html \n\n" +
-//                    "When the file is opened, the following result is displayed in the web browser:", "https://api.sololearn.com/DownloadFile?id=2527",
-//                    "Don’t forget to save the file. HTML file names should end in either .html or .htm"))
-//            database.addUserMIQ(Database.UserMIQ(userId, moduleId, "", info3, false, 3))
-//            val question4 = database.addQuestion(Database.Question("What is the correct extension for HTML files?", ".css\n.txt\n_?_.html\n.exe", 1))
-//            database.addUserMIQ(Database.UserMIQ(userId, moduleId, question4, "", true, 4))
-//            val info5 = database.addInfo(Database.Info("The <title> Tag", "To place a title on the tab describing the web page, add a <title> element to your head section:\n\n" +
-//                    "<html>\n   <head>\n      <title>first page</title>\n   </head>\n   <body>\n      This is a line of text. \n   </body>\n</html>\n\nThis will produce the following result:",
-//                    "https://api.sololearn.com/DownloadFile?id=2528", "The title element is important because it describes the page and is used by search engines."))
-//            database.addUserMIQ(Database.UserMIQ(userId, moduleId, "", info5, false, 5))
-//            val question6 = database.addQuestion(Database.Question("Where should you put the title tag?", "_?_Between the head tags\nBefore the html tag\nBetween the body tags\nAfter the closing html tag",
-//                    1))
-//            database.addUserMIQ(Database.UserMIQ(userId, moduleId, question6, "", true, 6))
-
-//            val module13 = database.addModule(Database.Module(chapter1, "Creating Your First HTML Page", 3))
-//            val module14 = database.addModule(Database.Module(chapter1, "Creating a Blog", 4))
-//            val module15 = database.addModule(Database.Module(chapter1, "Module 1 Quiz", 5))
-//            val chapter2 = database.addChapter(Database.Chapter(lessonId, "HTML Basics", "https://png.icons8.com/ios/256/ffffff/web.png", "https://png.icons8.com/ios/256/A6A6A6/web.png", 2))
-//            val chapter3 = database.addChapter(Database.Chapter(lessonId, "Challenges", "https://png.icons8.com/ios/256/ffffff/trophy.png", "https://png.icons8.com/ios/256/A6A6A6/trophy.png", 3))
-//            val chapter4 = database.addChapter(Database.Chapter(lessonId, "HTML5", "https://png.icons8.com/ios/256/ffffff/html-5.png", "https://png.icons8.com/ios/256/A6A6A6/html-5.png", 4))
-
-            database.databaseChapters.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError?) {
-
+            database.getUserLessonAll(userId) {
+                it.forEach {
+                    it.started = false
+                    database.editUserLesson(it)
+                    database.getLesson(it.lessonId) {
+                        database.getChapterAll(it) {
+                            it.forEach {
+                                val chapter = it
+                                if (chapter.position == 1) {
+                                    database.getUserStatus(userId, it.id) {
+                                        it.status = 1
+                                        database.editUserStatus(it)
+                                    }
+                                } else {
+                                    database.getUserStatus(userId, it.id) {
+                                        it.status = 0
+                                        database.editUserStatus(it)
+                                    }
+                                }
+                                database.getModuleAll(it.id) {
+                                    it.forEach {
+                                        val module = it
+                                        if (module.position == 1 && chapter.position == 1) {
+                                            database.getUserStatus(userId, it.id) {
+                                                it.status = 1
+                                                database.editUserStatus(it)
+                                            }
+                                        } else {
+                                            database.getUserStatus(userId, it.id) {
+                                                it.status = 0
+                                                database.editUserStatus(it)
+                                            }
+                                        }
+                                        database.getModuleIQAll(it.id) {
+                                            it.forEach {
+                                                if (it.position == 1 && chapter.position == 1 && module.position == 1) {
+                                                    database.getUserMIQ(userId, it.id) {
+                                                        it.locked = false
+                                                        database.editUserMIQ(it)
+                                                    }
+                                                } else {
+                                                    database.getUserMIQ(userId, it.id) {
+                                                        it.locked = true
+                                                        database.editUserMIQ(it)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-
-                override fun onDataChange(data: DataSnapshot?) {
-                    val chapters = ArrayList<Database.Chapter>()
-                    data?.children?.mapNotNullTo(chapters, { it.getValue(Database.Chapter::class.java) })
-                    chapters.forEach { database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, it.id)) }
-                }
-            })
-
-            database.databaseModules.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError?) {
-
-                }
-
-                override fun onDataChange(data: DataSnapshot?) {
-                    val modules = ArrayList<Database.Module>()
-                    data?.children?.mapNotNullTo(modules, { it.getValue(Database.Module::class.java) })
-                    modules.forEach { database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, it.id)) }
-                }
-            })
-
+            }
         }
 
     }

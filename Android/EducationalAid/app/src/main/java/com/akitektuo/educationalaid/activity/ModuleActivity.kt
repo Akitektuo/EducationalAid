@@ -8,13 +8,16 @@ import com.akitektuo.educationalaid.adapter.PagerAdapter
 import com.akitektuo.educationalaid.component.TabbedPagerComponent
 import com.akitektuo.educationalaid.fragment.InfoFragment
 import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_ID
-import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_ID_UMIQ
+import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_ID_MIQ
 import com.akitektuo.educationalaid.fragment.InfoFragment.Companion.KEY_LOCKED
 import com.akitektuo.educationalaid.fragment.QuestionFragment
 import com.akitektuo.educationalaid.fragment.QuestionFragment.Companion.KEY_TOTAL
 import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_module.*
 
 class ModuleActivity : AppCompatActivity() {
@@ -43,28 +46,44 @@ class ModuleActivity : AppCompatActivity() {
 
         val fragments = ArrayList<PagerAdapter.TabFragment>()
 
-        database.getUserMIQAll(auth.currentUser?.uid!!, moduleId, {
-            val questions = it.count { it.question }
-            it.forEach {
-                val arguments = Bundle()
-                if (it.question) {
-                    val fragmentQuestion = QuestionFragment()
-                    arguments.putString(KEY_ID, it.questionId)
-                    arguments.putBoolean(KEY_LOCKED, it.locked)
-                    arguments.putString(KEY_ID_UMIQ, it.id)
-                    arguments.putInt(KEY_TOTAL, questions)
-                    fragmentQuestion.arguments = arguments
-                    fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected, R.drawable.question_silver, it.locked))
-                } else {
-                    val fragmentInfo = InfoFragment()
-                    arguments.putString(KEY_ID, it.infoId)
-                    arguments.putBoolean(KEY_LOCKED, it.locked)
-                    arguments.putString(KEY_ID_UMIQ, it.id)
-                    fragmentInfo.arguments = arguments
-                    fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected, R.drawable.book_silver, it.locked))
+        database.getModuleIQAll(moduleId, {
+            val modulesIsQs = it
+            database.databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError?) {
+
                 }
-            }
-            tabbedPager = TabbedPagerComponent(this, pager, tab, fragments)
+
+                override fun onDataChange(data: DataSnapshot?) {
+                    val usersMsIsQs = ArrayList<Database.UserMIQ>()
+                    data?.children?.mapNotNullTo(usersMsIsQs) { it.getValue(Database.UserMIQ::class.java) }
+                    val questions = modulesIsQs.count { it.question }
+                    modulesIsQs.forEach {
+                        val arguments = Bundle()
+                        val moduleIQ = it
+                        var locked = true
+                        usersMsIsQs.filter { it.moduleIQId == moduleIQ.id }.forEach {
+                            locked = it.locked
+                        }
+                        if (it.question) {
+                            val fragmentQuestion = QuestionFragment()
+                            arguments.putString(KEY_ID, moduleIQ.questionId)
+                            arguments.putBoolean(KEY_LOCKED, locked)
+                            arguments.putString(KEY_ID_MIQ, moduleIQ.id)
+                            arguments.putInt(KEY_TOTAL, questions)
+                            fragmentQuestion.arguments = arguments
+                            fragments.add(PagerAdapter.TabFragment(fragmentQuestion, R.drawable.question, R.drawable.question_selected, R.drawable.question_silver, locked))
+                        } else {
+                            val fragmentInfo = InfoFragment()
+                            arguments.putString(KEY_ID, moduleIQ.infoId)
+                            arguments.putBoolean(KEY_LOCKED, locked)
+                            arguments.putString(KEY_ID_MIQ, moduleIQ.id)
+                            fragmentInfo.arguments = arguments
+                            fragments.add(PagerAdapter.TabFragment(fragmentInfo, R.drawable.book, R.drawable.book_selected, R.drawable.book_silver, locked))
+                        }
+                    }
+                    tabbedPager = TabbedPagerComponent(this@ModuleActivity, pager, tab, fragments)
+                }
+            })
         })
 //
 //        for (i in 0..5) {

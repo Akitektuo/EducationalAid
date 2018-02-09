@@ -21,12 +21,13 @@ class InfoFragment : Fragment() {
     companion object {
         const val KEY_ID = "key_id"
         const val KEY_LOCKED = "key_locked"
-        const val KEY_ID_UMIQ = "key_umiq"
+        const val KEY_ID_MIQ = "key_umiq"
     }
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: Database
-    private lateinit var userMIQId: String
+    private lateinit var moduleIQId: String
+    private var isLocked: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = inflater.inflate(R.layout.fragment_info, container, false)
 
@@ -36,7 +37,8 @@ class InfoFragment : Fragment() {
         database = Database()
         auth = FirebaseAuth.getInstance()
         val bundle = arguments
-        userMIQId = bundle?.getString(KEY_ID_UMIQ)!!
+        moduleIQId = bundle?.getString(KEY_ID_MIQ)!!
+        isLocked = bundle.getBoolean(KEY_LOCKED)
         // get data from db for ID
         database.getInfo(bundle.getString(KEY_ID)!!, {
             textTitle.text = it.title
@@ -51,7 +53,7 @@ class InfoFragment : Fragment() {
             } else {
                 textImportant.text = it.importance
             }
-            if (bundle.getBoolean(KEY_LOCKED)) {
+            if (isLocked) {
                 imageLocked.visibility = View.VISIBLE
             }
 
@@ -74,15 +76,18 @@ class InfoFragment : Fragment() {
 //        }
 
         buttonContinue.setOnClickListener {
-            (activity as ModuleActivity).continueOnClick(userMIQId)
+            (activity as ModuleActivity).continueOnClick(moduleIQId)
         }
     }
 
     fun unlockFragment() {
         imageLocked.visibility = View.GONE
-        database.getUserMIQ(userMIQId, {
-            it.locked = false
-            database.editUserMIQ(it)
+        isLocked = false
+        database.getUserMIQ(auth.currentUser?.uid!!, moduleIQId, {
+            if (it.locked) {
+                it.locked = false
+                database.editUserMIQ(it)
+            }
         })
     }
 

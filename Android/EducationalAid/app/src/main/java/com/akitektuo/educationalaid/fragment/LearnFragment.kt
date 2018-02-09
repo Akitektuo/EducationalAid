@@ -52,20 +52,25 @@ class LearnFragment : Fragment() {
                 if (model.visibility != 0) {
                     database.isLessonAvailableForUser(userId, model.id, {
                         val isPaid = it
-                        database.getUserMIQForLesson(userId, model, {
-                            var progress = 0
-                            if (model.started) {
-                                progress = it.count { !it.locked }
-                            }
-                            viewHolder.bind(LessonViewHolder.Lesson(activity?.applicationContext!!, model.name, model.image, progress, it.size, {
-                                if (isPaid) {
-                                    val intent = Intent(context, LessonActivity::class.java)
-                                    intent.putExtra("key_id", model.id)
-                                    startActivity(intent)
-                                } else {
-                                    toast("Buying lessons will be implemented in other versions")
+                        database.getUserLessonAll(userId, model.id, {
+                            val userLesson = it
+                            database.getUserMIQForLesson(userId, model, {
+                                var progress = 0
+                                if (userLesson.started) {
+                                    progress = it.count { !it.locked }
                                 }
-                            }))
+                                viewHolder.bind(LessonViewHolder.Lesson(activity?.applicationContext!!, model.name, model.image, progress, it.size, {
+                                    if (isPaid) {
+                                        userLesson.started = true
+                                        database.editUserLesson(userLesson)
+                                        val intent = Intent(context, LessonActivity::class.java)
+                                        intent.putExtra("key_id", model.id)
+                                        startActivity(intent)
+                                    } else {
+                                        toast("Buying lessons will be implemented in other versions")
+                                    }
+                                }))
+                            })
                         })
                     })
                 }

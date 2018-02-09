@@ -75,11 +75,11 @@ class TabbedPagerComponent(
     override fun onPageSelected(position: Int) {
     }
 
-    fun nextFragment(idUMIQ: String) {
+    fun nextFragment(idMIQ: String) {
         val position = tab.selectedTabPosition + 1
+        val userId = auth.currentUser?.uid!!
         if (position == fragments.size) {
-            //TODO unlock next part
-            database.unlockNext(auth.currentUser?.uid!!, idUMIQ, {
+            database.unlockNext(userId, idMIQ, {
                 activity.finish()
             })
         } else {

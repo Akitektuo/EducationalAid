@@ -53,4 +53,6 @@
     <string name="edit_name">Editați numele</string>
     <string name="change_picture">Schimbați poza</string>
     <string name="save">Salvați</string>
+    <string name="find_people">Găsește lume</string>
+    <string name="not_enough_xp">Nu aveți destul XP</string>
 </resources>

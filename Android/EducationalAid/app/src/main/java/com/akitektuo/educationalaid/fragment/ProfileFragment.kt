@@ -11,6 +11,9 @@ import com.akitektuo.educationalaid.storage.database.Database
 import com.akitektuo.educationalaid.util.Tool.Companion.load
 import com.firebase.client.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 
@@ -32,6 +35,23 @@ class ProfileFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         database = Database()
         updateUserInfo()
+        database.databaseUsers.child(auth.currentUser?.uid).addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val user = data?.getValue(Database.User::class.java)!!
+                textLevel.text = getString(R.string.level, user.level)
+                textCurrentXp.text = getString(R.string.xp, user.currentXp)
+                val targetXp = (user.currentXp / 100 + 1) * 100
+                textTargetXp.text = getString(R.string.xp, targetXp)
+                progressLevel.progress = user.currentXp % 100
+            }
+        })
+
+        textFindPeople.setOnClickListener {
+            toast("Soon")
+        }
     }
 
     fun updateUserInfo() {

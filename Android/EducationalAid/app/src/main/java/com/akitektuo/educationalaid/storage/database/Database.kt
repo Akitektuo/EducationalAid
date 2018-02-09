@@ -25,8 +25,8 @@ class Database {
             var name: String = "",
             val email: String = "",
             var image: String = "",
-            val level: Int = 1,
-            val currentXp: Int = 0,
+            var level: Int = 1,
+            var currentXp: Int = 0,
             val admin: Boolean = false,
             var id: String = "")
 
@@ -35,6 +35,7 @@ class Database {
             val lessonId: String = "",
             val admin: Boolean = false,
             val paid: Boolean = false,
+            var started: Boolean = false,
             var id: String = "")
 
     /**
@@ -68,7 +69,6 @@ class Database {
     data class Lesson(
             val name: String = "",
             val visibility: Int = 0,
-            val started: Boolean = false,
             var image: String = "",
             var price: Double = 0.0,
             var id: String = "")
@@ -76,7 +76,7 @@ class Database {
     data class UserStatus(
             val userId: String = "",
             val statusId: String = "",
-            val status: Int = 0,
+            var status: Int = 0,
             var id: String = "")
 
     /**
@@ -107,12 +107,16 @@ class Database {
 
     data class UserMIQ(
             val userId: String = "",
+            val moduleIQId: String = "",
+            var locked: Boolean = true,
+            var id: String = "")
+
+    data class ModuleIQ(
             val moduleId: String = "",
             val questionId: String = "",
             val infoId: String = "",
             val question: Boolean = false,
             val position: Int = 0,
-            var locked: Boolean = true,
             var id: String = "")
 
     data class Info(
@@ -137,7 +141,7 @@ class Database {
             val type: Int = 0,
             var id: String = "")
 
-    private val databaseUsers = database.child("Users")
+    val databaseUsers = database.child("Users")
     private val databaseUsersLessons = database.child("UsersLessons")
     private val databaseActions = database.child("Actions")
     private val databaseUsersFollowers = database.child("UsersFollowers")
@@ -145,7 +149,8 @@ class Database {
     val databaseChapters = database.child("Chapters")
     val databaseModules = database.child("Modules")
     val databaseUsersStatus = database.child("UsersStatus")
-    private val databaseUsersMsIsQs = database.child("ModulesIsQs")
+    private val databaseModulesIsQs = database.child("ModulesIsQs")
+    val databaseUsersMsIsQs = database.child("UsersMsIsQs")
     private val databaseInfos = database.child("Infos")
     private val databaseQuestions = database.child("Questions")
     private val storageUsers = storage.child("Users")
@@ -153,10 +158,18 @@ class Database {
     private val storageChapters = storage.child("Chapters")
     private val storageInfos = storage.child("Infos")
 
+    fun addUserMIQ(userMIQ: UserMIQ) {
+        if (userMIQ.id.isEmpty()) {
+            userMIQ.id = databaseUsersMsIsQs.push().key
+        }
+        databaseUsersMsIsQs.child(userMIQ.id).setValue(userMIQ)
+    }
+
     fun addUser(user: User, image: Uri? = null, afterResult: (profileUpdate: UserProfileChangeRequest) -> Unit = {}) {
         if (user.id.isEmpty()) {
             user.id = databaseUsers.push().key
         }
+        bindUserWithLessons(user.id)
         if (image == null) {
             databaseUsers.child(user.id).setValue(user)
         } else {
@@ -171,6 +184,51 @@ class Database {
             }
         }
 
+    }
+
+    fun bindUserWithLessons(userId: String) {
+        databaseLessons.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val lessons = ArrayList<Lesson>()
+                data?.children?.mapNotNullTo(lessons, { it.getValue(Lesson::class.java) })
+                lessons.filter { it.visibility != 0 }.forEach { lessons.remove(it) }
+                lessons.forEach {
+                    getChapterAll(it) {
+                        it.forEach {
+                            val chapter = it
+                            if (chapter.position == 1) {
+                                addUserStatus(UserStatus(userId, it.id, 1))
+                            } else {
+                                addUserStatus(UserStatus(userId, it.id, 0))
+                            }
+                            getModuleAll(chapter.id) {
+                                it.forEach {
+                                    val module = it
+                                    if (chapter.position == 1 && module.position == 1) {
+                                        addUserStatus(UserStatus(userId, it.id, 1))
+                                    } else {
+                                        addUserStatus(UserStatus(userId, it.id, 0))
+                                    }
+                                    getModuleIQAll(module.id) {
+                                        it.forEach {
+                                            if (chapter.position == 1 && module.position == 1 && it.position == 1) {
+                                                addUserMIQ(UserMIQ(userId, it.id, false))
+                                            } else {
+                                                addUserMIQ(UserMIQ(userId, it.id, true))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
 
     fun addUserStatus(userStatus: UserStatus) {
@@ -195,7 +253,7 @@ class Database {
         })
     }
 
-    fun editUser(user: User, onCompleteListener: (task: Task<Void>, user: User) -> Unit, image: Uri? = null) {
+    fun editUser(user: User, onCompleteListener: (task: Task<Void>, user: User) -> Unit = { _, _ -> }, image: Uri? = null) {
         if (image == null) {
             databaseUsers.child(user.id).setValue(user).addOnCompleteListener({
                 onCompleteListener(it, user)
@@ -263,7 +321,7 @@ class Database {
         })
     }
 
-    fun getUserLessonAll(user: User, afterResult: (usersLessons: ArrayList<UserLesson>) -> Unit) {
+    fun getUserLessonAll(userId: String, afterResult: (usersLessons: ArrayList<UserLesson>) -> Unit) {
         databaseUsersLessons.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
@@ -274,7 +332,8 @@ class Database {
                 data?.children?.mapNotNullTo(usersLessons, {
                     it.getValue<UserLesson>(UserLesson::class.java)
                 })
-                afterResult(usersLessons.filter { it.userId == user.id } as ArrayList<UserLesson>)
+                usersLessons.filter { it.userId != userId }.forEach { usersLessons.remove(it) }
+                afterResult(usersLessons)
             }
         })
     }
@@ -291,6 +350,23 @@ class Database {
                     it.getValue<UserLesson>(UserLesson::class.java)
                 })
                 afterResult(usersLessons.filter { it.userId == lesson.id } as ArrayList<UserLesson>)
+            }
+        })
+    }
+
+    fun getUserLessonAll(userId: String, lessonId: String, afterResult: (userLesson: UserLesson) -> Unit) {
+        databaseUsersLessons.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersLessons = ArrayList<UserLesson>()
+                data?.children?.mapNotNullTo(usersLessons, {
+                    it.getValue<UserLesson>(UserLesson::class.java)
+                })
+                usersLessons.filter { it.userId != userId || it.lessonId != lessonId }.forEach { usersLessons.remove(it) }
+                afterResult(usersLessons[0])
             }
         })
     }
@@ -489,7 +565,7 @@ class Database {
         })
     }
 
-    fun getChaterAll(lesson: Lesson, afterResult: (chapters: ArrayList<Chapter>) -> Unit) {
+    fun getChapterAll(lesson: Lesson, afterResult: (chapters: ArrayList<Chapter>) -> Unit) {
         databaseChapters.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
@@ -500,7 +576,8 @@ class Database {
                 data?.children?.mapNotNullTo(chapters, {
                     it.getValue<Chapter>(Chapter::class.java)
                 })
-                afterResult(chapters.filter { it.lessonId == lesson.id }.sortedBy { it.position } as ArrayList<Chapter>)
+                chapters.filter { it.lessonId != lesson.id }.sortedBy { it.position }.forEach { chapters.remove(it) }
+                afterResult(chapters)
             }
         })
     }
@@ -590,32 +667,49 @@ class Database {
         })
     }
 
-    fun addUserMIQ(userMIQ: UserMIQ): String {
-        if (userMIQ.id.isEmpty()) {
-            userMIQ.id = databaseUsersMsIsQs.push().key
+    fun addModuleIQ(moduleIQ: ModuleIQ): String {
+        if (moduleIQ.id.isEmpty()) {
+            moduleIQ.id = databaseModulesIsQs.push().key
         }
-        databaseUsersMsIsQs.child(userMIQ.id).setValue(userMIQ)
-        return userMIQ.id
+        databaseModulesIsQs.child(moduleIQ.id).setValue(moduleIQ)
+        return moduleIQ.id
     }
 
-    fun editUserMIQ(userMIQ: UserMIQ, onCompleteListener: OnCompleteListener<Void> = OnCompleteListener { }) {
-        databaseUsersMsIsQs.child(userMIQ.id).setValue(userMIQ).addOnCompleteListener(onCompleteListener)
+    fun editModuleIQ(moduleIQ: ModuleIQ, onCompleteListener: OnCompleteListener<Void> = OnCompleteListener { }) {
+        databaseModulesIsQs.child(moduleIQ.id).setValue(moduleIQ).addOnCompleteListener(onCompleteListener)
     }
 
-    fun getUserMIQ(id: String, afterResult: (userMIQ: UserMIQ) -> Unit) {
-        databaseUsersMsIsQs.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+    fun getModuleIQ(id: String, afterResult: (moduleIQ: ModuleIQ) -> Unit) {
+        databaseModulesIsQs.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
             }
 
             override fun onDataChange(data: DataSnapshot?) {
-                afterResult(data?.getValue(UserMIQ::class.java)!!)
+                afterResult(data?.getValue(ModuleIQ::class.java)!!)
             }
         })
     }
 
-    fun getUserMIQAll(user: User, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
-        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+    fun getModuleIQAll(moduleId: String, afterResult: (modulesIsQs: ArrayList<ModuleIQ>) -> Unit) {
+        databaseModulesIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val modulesIsQs = ArrayList<ModuleIQ>()
+                data?.children?.mapNotNullTo(modulesIsQs, {
+                    it.getValue(ModuleIQ::class.java)
+                })
+                modulesIsQs.filter { it.moduleId != moduleId }.sortedBy { it.position }.forEach { modulesIsQs.remove(it) }
+                afterResult(modulesIsQs)
+            }
+        })
+    }
+
+    fun getModelIQAll(userId: String, moduleId: String, afterResult: (modelsIsQs: ArrayList<ModuleIQ>) -> Unit) {
+        databaseModulesIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
             }
@@ -625,72 +719,22 @@ class Database {
                 data?.children?.mapNotNullTo(usersMsIsQs, {
                     it.getValue<UserMIQ>(UserMIQ::class.java)
                 })
-                afterResult(usersMsIsQs.filter { it.userId == user.id }.sortedBy { it.position } as ArrayList<UserMIQ>)
-            }
-        })
-    }
+                usersMsIsQs.filter { it.userId != userId }.forEach { usersMsIsQs.remove(it) }
+                databaseModulesIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError?) {
+                    }
 
-    fun getUserMIQAll(module: Module, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
-        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError?) {
+                    override fun onDataChange(data: DataSnapshot?) {
+                        val modulesIsQsTemp = ArrayList<ModuleIQ>()
+                        val modulesIsQs = ArrayList<ModuleIQ>()
+                        data?.children?.mapNotNullTo(modulesIsQsTemp, { it.getValue(ModuleIQ::class.java) })
+                        for (userMIQ in usersMsIsQs) {
+                            modulesIsQsTemp.filter { it.id == userMIQ.moduleIQId && it.moduleId == moduleId }.forEach { modulesIsQs.add(it) }
+                        }
+                        afterResult(modulesIsQs)
+                    }
 
-            }
-
-            override fun onDataChange(data: DataSnapshot?) {
-                val usersMsIsQs = ArrayList<UserMIQ>()
-                data?.children?.mapNotNullTo(usersMsIsQs, {
-                    it.getValue<UserMIQ>(UserMIQ::class.java)
                 })
-                afterResult(usersMsIsQs.filter { it.moduleId == module.id }.sortedBy { it.position } as ArrayList<UserMIQ>)
-            }
-        })
-    }
-
-    fun getUserMIQAll(info: Info, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
-        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError?) {
-
-            }
-
-            override fun onDataChange(data: DataSnapshot?) {
-                val usersMsIsQs = ArrayList<UserMIQ>()
-                data?.children?.mapNotNullTo(usersMsIsQs, {
-                    it.getValue<UserMIQ>(UserMIQ::class.java)
-                })
-                afterResult(usersMsIsQs.filter { !it.question && it.infoId == info.id }.sortedBy { it.position } as ArrayList<UserMIQ>)
-            }
-        })
-    }
-
-    fun getUserMIQAll(question: Question, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
-        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError?) {
-
-            }
-
-            override fun onDataChange(data: DataSnapshot?) {
-                val usersMsIsQs = ArrayList<UserMIQ>()
-                data?.children?.mapNotNullTo(usersMsIsQs, {
-                    it.getValue<UserMIQ>(UserMIQ::class.java)
-                })
-                afterResult(usersMsIsQs.filter { it.question && it.questionId == question.id }.sortedBy { it.position } as ArrayList<UserMIQ>)
-            }
-        })
-    }
-
-    fun getUserMIQAll(userId: String, moduleId: String, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
-        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError?) {
-
-            }
-
-            override fun onDataChange(data: DataSnapshot?) {
-                val usersMsIsQs = ArrayList<UserMIQ>()
-                data?.children?.mapNotNullTo(usersMsIsQs, {
-                    it.getValue<UserMIQ>(UserMIQ::class.java)
-                })
-                usersMsIsQs.filter { it.userId != userId || it.moduleId != moduleId }.sortedBy { it.position }.forEach { usersMsIsQs.remove(it) }
-                afterResult(usersMsIsQs)
             }
         })
     }
@@ -702,9 +746,10 @@ class Database {
             }
 
             override fun onDataChange(data: DataSnapshot?) {
+                val chaptersTemp = ArrayList<Chapter>()
                 val chapters = ArrayList<Chapter>()
-                data?.children?.mapNotNullTo(chapters, { it.getValue(Chapter::class.java) })
-                chapters.filter { it.lessonId == lesson.id }.sortedBy { it.position }
+                data?.children?.mapNotNullTo(chaptersTemp, { it.getValue(Chapter::class.java) })
+                chaptersTemp.filter { it.lessonId == lesson.id }.sortedBy { it.position }.forEach { chapters.add(it) }
                 databaseModules.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError?) {
 
@@ -719,40 +764,40 @@ class Database {
                                     .sortedBy { it.position }
                                     .forEach { modules.add(it) }
                         }
-                        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+                        databaseModulesIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(error: DatabaseError?) {
 
                             }
 
                             override fun onDataChange(data: DataSnapshot?) {
-                                val usersMsIsQsTemp = ArrayList<UserMIQ>()
-                                val usersMsIsQs = ArrayList<UserMIQ>()
-                                data?.children?.mapNotNullTo(usersMsIsQsTemp, { it.getValue(UserMIQ::class.java) })
+                                val modulesIsQs = ArrayList<ModuleIQ>()
+                                val modulesIsQsTemp = ArrayList<ModuleIQ>()
+                                data?.children?.mapNotNullTo(modulesIsQsTemp, { it.getValue(ModuleIQ::class.java) })
                                 for (module in modules) {
-                                    usersMsIsQsTemp.filter { module.id != it.moduleId || it.userId != userId }
-                                            .sortedBy { it.position }
-                                            .forEach { usersMsIsQs.add(it) }
+                                    modulesIsQsTemp.filter { module.id == it.moduleId }.forEach { modulesIsQs.add(it) }
                                 }
-                                afterResult(usersMsIsQs)
+                                databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onCancelled(error: DatabaseError?) {
+
+                                    }
+
+                                    override fun onDataChange(data: DataSnapshot?) {
+                                        val usersMsIsQsTemp = ArrayList<UserMIQ>()
+                                        val usersMsIsQs = ArrayList<UserMIQ>()
+                                        data?.children?.mapNotNullTo(usersMsIsQsTemp, { it.getValue(UserMIQ::class.java) })
+                                        for (module in modulesIsQs) {
+                                            usersMsIsQsTemp.filter { module.id == it.moduleIQId && it.userId == userId }
+                                                    .forEach {
+                                                        usersMsIsQs.add(it)
+                                                    }
+                                        }
+                                        afterResult(usersMsIsQs)
+                                    }
+                                })
                             }
                         })
                     }
                 })
-            }
-        })
-    }
-
-    fun getUserMIQForInfo(userId: String, infoId: String, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
-        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError?) {
-
-            }
-
-            override fun onDataChange(data: DataSnapshot?) {
-                val usersMsIsQs = ArrayList<UserMIQ>()
-                data?.children?.mapNotNullTo(usersMsIsQs, { it.getValue(UserMIQ::class.java) })
-                usersMsIsQs.filter { it.userId != userId || it.infoId != infoId }.sortedBy { it.position }.forEach { usersMsIsQs.remove(it) }
-                afterResult(usersMsIsQs)
             }
         })
     }
@@ -774,30 +819,130 @@ class Database {
         })
     }
 
-    fun unlockNext(userId: String, userMIQId: String, afterResult: () -> Unit) {
-        getUserMIQ(userMIQId, {
+    fun editUserStatus(userStatus: UserStatus, onCompleteListener: (task: Task<Void>, userStatus: UserStatus) -> Unit = { _, _ -> }) {
+        databaseUsersStatus.child(userStatus.id).setValue(userStatus).addOnCompleteListener({ onCompleteListener(it, userStatus) })
+    }
+
+    fun getUserMIQ(id: String, afterResult: (userMIQ: UserMIQ) -> Unit) {
+        databaseUsersMsIsQs.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                afterResult(data?.getValue(UserMIQ::class.java)!!)
+            }
+        })
+    }
+
+    fun getUserMIQ(userId: String, moduleIQId: String, afterResult: (userMIQ: UserMIQ) -> Unit) {
+        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersMsIsQs = ArrayList<UserMIQ>()
+                data?.children?.mapNotNullTo(usersMsIsQs, { it.getValue(UserMIQ::class.java) })
+                usersMsIsQs.filter { it.moduleIQId != moduleIQId || it.userId != userId }.forEach { usersMsIsQs.remove(it) }
+                afterResult(usersMsIsQs[0])
+            }
+        })
+    }
+
+    fun getUserMIQAll(moduleIQId: String, afterResult: (usersMsIsQs: ArrayList<UserMIQ>) -> Unit) {
+        databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersMsIsQs = ArrayList<UserMIQ>()
+                data?.children?.mapNotNullTo(usersMsIsQs, { it.getValue(UserMIQ::class.java) })
+                usersMsIsQs.filter { it.moduleIQId != moduleIQId }.forEach { usersMsIsQs.remove(it) }
+                afterResult(usersMsIsQs)
+            }
+        })
+    }
+
+    fun editUserMIQ(userMIQ: UserMIQ) {
+        databaseUsersMsIsQs.child(userMIQ.id).setValue(userMIQ)
+    }
+
+    fun unlockNext(userId: String, moduleIQId: String, afterResult: () -> Unit) {
+        getModuleIQ(moduleIQId) {
             getModule(it.moduleId, {
                 val currentModule = it
                 getChapter(currentModule.chapterId, {
                     val currentChapter = it
                     getModuleAll(currentChapter.id, {
+                        getUserStatus(userId, currentModule.id, {
+                            it.status = 2
+                            editUserStatus(it)
+                        })
                         if (currentModule.position == it.size) {
                             getLesson(currentChapter.lessonId, {
-                                getChaterAll(it, {
+                                getChapterAll(it, {
                                     //edit current chapter to finished
-                                    getUserStatus(userId, currentChapter.id, {})
+                                    getUserStatus(userId, currentChapter.id, {
+                                        it.status = 2
+                                        editUserStatus(it)
+                                    })
                                     if (currentChapter.position < it.size) {
-
+                                        val nextChapter = it[currentChapter.position + 1]
+                                        getModuleAll(nextChapter.id, {
+                                            if (it.size > 0) {
+                                                val nextModule = it[0]
+                                                getUserStatus(userId, nextModule.id, {
+                                                    it.status = 1
+                                                    editUserStatus(it)
+                                                })
+                                                getModuleIQAll(nextModule.id) {
+                                                    if (it.size > 0) {
+                                                        getUserMIQ(userId, it[0].id) {
+                                                            it.locked = false
+                                                            editUserMIQ(it)
+                                                            afterResult()
+                                                        }
+                                                    } else {
+                                                        afterResult()
+                                                    }
+                                                }
+                                            } else {
+                                                afterResult()
+                                            }
+                                        })
+                                    } else {
+                                        afterResult()
                                     }
                                 })
                             })
                         } else {
-                            //unlock it[currentModule.position]
+                            val nextModule = it[currentModule.position]
+                            getUserStatus(userId, nextModule.id, {
+                                it.status = 1
+                                editUserStatus(it)
+                            })
+                            getModuleIQAll(nextModule.id) {
+                                if (it.size > 0) {
+                                    getUserMIQ(userId, it[0].id) {
+                                        it.locked = false
+                                        editUserMIQ(it)
+                                        afterResult()
+                                    }
+                                } else {
+                                    afterResult()
+                                }
+                            }
                         }
                     })
                 })
             })
-        })
+        }
+    }
+
+    fun editUserLesson(userLesson: Database.UserLesson) {
+        databaseUsersLessons.child(userLesson.id).setValue(userLesson)
     }
 
 }

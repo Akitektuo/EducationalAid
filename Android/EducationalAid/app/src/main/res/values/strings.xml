@@ -55,4 +55,6 @@
     <string name="edit_name">Edit name</string>
     <string name="change_picture">Change picture</string>
     <string name="save">Save</string>
+    <string name="find_people">Find people</string>
+    <string name="not_enough_xp">Not enough XP</string>
 </resources>

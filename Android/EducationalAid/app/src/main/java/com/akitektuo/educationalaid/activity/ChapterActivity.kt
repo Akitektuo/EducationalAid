@@ -56,13 +56,13 @@ class ChapterActivity : AppCompatActivity() {
                     database.isModuleAvailableForChapter(model.id, chapterId, {
                         database.getUserStatus(auth.currentUser?.uid!!, model.id, {
                             val status = it.status
-                            database.getUserMIQAll(auth.currentUser?.uid!!, model.id, {
+                            database.getModuleIQAll(model.id) {
                                 viewHolder.bind(ModuleViewHolder.Module(this@ChapterActivity, model.position, total, model.name, it.count { it.question }, status, {
                                     val intent = Intent(this@ChapterActivity, ModuleActivity::class.java)
                                     intent.putExtra("key_id", model.id)
                                     startActivity(intent)
                                 }))
-                            })
+                            }
                         })
                     })
                 }

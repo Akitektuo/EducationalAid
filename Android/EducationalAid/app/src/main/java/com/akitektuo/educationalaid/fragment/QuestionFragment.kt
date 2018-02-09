@@ -38,7 +38,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     companion object {
         const val KEY_ID = "key_id"
         const val KEY_LOCKED = "key_locked"
-        const val KEY_ID_UMIQ = "key_umiq"
+        const val KEY_ID_MIQ = "key_umiq"
         const val KEY_TOTAL = "key_total"
 
         const val TYPE_FILL_IN = 0
@@ -59,7 +59,9 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     private lateinit var preference: SettingsPreference
     private lateinit var database: Database
     private lateinit var auth: FirebaseAuth
-    private lateinit var userMIQId: String
+    private lateinit var moduleIQId: String
+    private lateinit var userId: String
+    private var isLocked = true
 
     private data class FillIn(val editText: EditText, val text: String, var nextFocus: EditText? = null) : TextWatcher {
 
@@ -101,7 +103,9 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
         val bundle = arguments
 
-        userMIQId = bundle?.getString(KEY_ID_UMIQ)!!
+        userId = auth.currentUser?.uid!!
+        moduleIQId = bundle?.getString(KEY_ID_MIQ)!!
+        isLocked = bundle.getBoolean(KEY_LOCKED)
         database.getQuestion(bundle.getString(KEY_ID)!!, {
             textCount.text = getString(R.string.out_of, it.position, bundle.getInt(KEY_TOTAL))
             textTask.text = it.task
@@ -112,7 +116,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 TYPE_DRAG_IN_ORDER -> decodeForDragInOrder(it.solving)
                 TYPE_DRAG_AND_DROP -> decodeForDragAndDrop(it.solving)
             }
-            if (bundle.getBoolean(KEY_LOCKED)) {
+            if (isLocked) {
                 imageLocked.visibility = View.VISIBLE
             }
         })
@@ -180,11 +184,18 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         }
 
         onUnlock = { _, _ ->
-            //decrement user's xp
-            for (x in resultsFillIn) {
-                x.editText.setText(x.text)
+            database.getUser(userId) {
+                if (it.currentXp > 14) {
+                    for (x in resultsFillIn) {
+                        x.editText.setText(x.text)
+                    }
+                    correct()
+                    it.currentXp -= 15
+                    database.editUser(it)
+                } else {
+                    toast(getString(R.string.not_enough_xp))
+                }
             }
-            correct()
         }
 
         buttonContinue.setOnClickListener {
@@ -198,7 +209,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     layoutFillIn.removeAllViews()
-                    (activity as ModuleActivity).continueOnClick(userMIQId)
+                    (activity as ModuleActivity).continueOnClick(moduleIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForFillIn(info)
@@ -219,11 +230,18 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         }
 
         onUnlock = { _, _ ->
-            //decrement user's xp
-            for (x in resultsSingleChoice) {
-                x.radioButton.isChecked = x.checked
+            database.getUser(userId) {
+                if (it.currentXp > 14) {
+                    for (x in resultsSingleChoice) {
+                        x.radioButton.isChecked = x.checked
+                    }
+                    correct()
+                    it.currentXp -= 15
+                    database.editUser(it)
+                } else {
+                    toast(getString(R.string.not_enough_xp))
+                }
             }
-            correct()
         }
 
         buttonContinue.setOnClickListener {
@@ -237,7 +255,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForSingleChoice(info)
-                    (activity as ModuleActivity).continueOnClick(userMIQId)
+                    (activity as ModuleActivity).continueOnClick(moduleIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForSingleChoice(info)
@@ -257,11 +275,18 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         }
 
         onUnlock = { _, _ ->
-            //decrement user's xp
-            for (x in resultsMultipleChoice) {
-                x.checkBox.isChecked = x.checked
+            database.getUser(userId) {
+                if (it.currentXp > 14) {
+                    for (x in resultsMultipleChoice) {
+                        x.checkBox.isChecked = x.checked
+                    }
+                    correct()
+                    it.currentXp -= 15
+                    database.editUser(it)
+                } else {
+                    toast(getString(R.string.not_enough_xp))
+                }
             }
-            correct()
         }
 
         buttonContinue.setOnClickListener {
@@ -275,7 +300,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForMultipleChoice(info)
-                    (activity as ModuleActivity).continueOnClick(userMIQId)
+                    (activity as ModuleActivity).continueOnClick(moduleIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForMultipleChoice(info)
@@ -298,21 +323,28 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         itemTouchHelper.attachToRecyclerView(listDraggable)
 
         onUnlock = { _, _ ->
-            //decrement user's xp
-            var i = 0
-            while (i < resultDraggable.size) {
-                if (i != resultDraggable[i].position) {
-                    listDraggable.adapter.notifyItemMoved(i, resultDraggable[i].position)
-                    val movedValue = resultDraggable[i]
-                    for (j in i until movedValue.position) {
-                        resultDraggable[j] = resultDraggable[j + 1]
+            database.getUser(userId) {
+                if (it.currentXp > 14) {
+                    var i = 0
+                    while (i < resultDraggable.size) {
+                        if (i != resultDraggable[i].position) {
+                            listDraggable.adapter.notifyItemMoved(i, resultDraggable[i].position)
+                            val movedValue = resultDraggable[i]
+                            for (j in i until movedValue.position) {
+                                resultDraggable[j] = resultDraggable[j + 1]
+                            }
+                            resultDraggable[movedValue.position] = movedValue
+                            i--
+                        }
+                        i++
                     }
-                    resultDraggable[movedValue.position] = movedValue
-                    i--
+                    correct()
+                    it.currentXp -= 15
+                    database.editUser(it)
+                } else {
+                    toast(getString(R.string.not_enough_xp))
                 }
-                i++
             }
-            correct()
         }
 
         buttonContinue.setOnClickListener {
@@ -326,7 +358,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForDragInOrder(info)
-                    (activity as ModuleActivity).continueOnClick(userMIQId)
+                    (activity as ModuleActivity).continueOnClick(moduleIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForDragInOrder(info)
@@ -383,16 +415,23 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
         }
 
         onUnlock = { _, _ ->
-            //decrement user's xp
-            layoutDragAndDropKeys.removeAllViews()
-            for (x in dragAndDropKeys) {
-                layoutDragAndDropKeys.addView(x)
+            database.getUser(userId) {
+                if (it.currentXp > 14) {
+                    layoutDragAndDropKeys.removeAllViews()
+                    for (x in dragAndDropKeys) {
+                        layoutDragAndDropKeys.addView(x)
+                    }
+                    for (x in resultsDragAndDrop) {
+                        x.editText.setText(x.text)
+                        layoutDragAndDropKeys.removeView(x.textView)
+                    }
+                    correct()
+                    it.currentXp -= 15
+                    database.editUser(it)
+                } else {
+                    toast(getString(R.string.not_enough_xp))
+                }
             }
-            for (x in resultsDragAndDrop) {
-                x.editText.setText(x.text)
-                layoutDragAndDropKeys.removeView(x.textView)
-            }
-            correct()
         }
 
         buttonContinue.setOnClickListener {
@@ -406,7 +445,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 }
                 getString(R.string.continue_button) -> {
                     decodeForDragAndDrop(info)
-                    (activity as ModuleActivity).continueOnClick(userMIQId)
+                    (activity as ModuleActivity).continueOnClick(moduleIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForDragAndDrop(info)
@@ -452,57 +491,80 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     fun unlockFragment() {
         imageLocked.visibility = View.GONE
-        database.getUserMIQ(userMIQId, {
-            it.locked = false
-            database.editUserMIQ(it)
+        isLocked = false
+        database.getUserMIQ(userId, moduleIQId, {
+            if (it.locked) {
+                it.locked = false
+                database.editUserMIQ(it)
+                database.getUser(userId) {
+                    it.currentXp += 5
+                    if (it.currentXp > it.level * 100) {
+                        it.level++
+                    }
+                    database.editUser(it)
+                }
+            }
         })
     }
 
     private fun buildHint() {
-        val builderHint = AlertDialog.Builder(context!!)
-        builderHint.setTitle(getString(R.string.dialog_hint_title))
-        builderHint.setMessage(getString(R.string.dialog_hint_body, 258))
-        builderHint.setPositiveButton("Ok", { _, _ ->
-            var usedBreak = false
-            for (x in resultsFillIn) {
-                val current = x.editText.text.toString()
-                val expected = x.text
-                if (current.isEmpty()) {
-                    x.editText.setText(expected[0].toString())
-                    usedBreak = true
-                    break
-                }
-                for (i in 0 until current.length) {
-                    if (current[i] != expected[i]) {
-                        x.editText.setText(current.substring(0, i) + expected[i])
-                        usedBreak = true
+        database.getUser(userId) {
+            val builderHint = AlertDialog.Builder(context!!)
+            builderHint.setTitle(getString(R.string.dialog_hint_title))
+            builderHint.setMessage(getString(R.string.dialog_hint_body, it.currentXp))
+            builderHint.setPositiveButton("Ok", { _, _ ->
+                if (it.currentXp > 4) {
+                    var usedBreak = false
+                    for (x in resultsFillIn) {
+                        val current = x.editText.text.toString()
+                        val expected = x.text
+                        if (current.isEmpty()) {
+                            x.editText.setText(expected[0].toString())
+                            usedBreak = true
+                            break
+                        }
+                        for (i in 0 until current.length) {
+                            if (current[i] != expected[i]) {
+                                x.editText.setText(current.substring(0, i) + expected[i])
+                                usedBreak = true
+                            }
+                        }
+                        if (current.length < expected.length) {
+                            x.editText.setText(current + expected[current.length])
+                            usedBreak = true
+                            break
+                        }
+                        if (usedBreak) {
+                            break
+                        }
                     }
+                    if (usedBreak) {
+                        it.currentXp -= 5
+                        database.editUser(it)
+                    }
+                } else {
+                    toast(getString(R.string.not_enough_xp))
                 }
-                if (current.length < expected.length) {
-                    x.editText.setText(current + expected[current.length])
-                    usedBreak = true
-                    break
-                }
-                if (usedBreak) {
-                    break
-                }
-            }
-            if (usedBreak) {
-                //decrement total user's xp
-            }
-        })
-        builderHint.setNegativeButton(getString(R.string.cancel), null)
-        builderHint.show()
+            })
+            builderHint.setNegativeButton(getString(R.string.cancel), null)
+            builderHint.show()
+        }
+    }
+
+    private fun toast(msg: String) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
     private fun buildUnlock() {
         layoutUnlock.setOnClickListener {
-            val builderUnlock = AlertDialog.Builder(context!!)
-            builderUnlock.setTitle(getString(R.string.dialog_unlock_title))
-            builderUnlock.setMessage(getString(R.string.dialog_unlock_body, 258))
-            builderUnlock.setPositiveButton("Ok", onUnlock)
-            builderUnlock.setNegativeButton(getString(R.string.cancel), null)
-            builderUnlock.show()
+            database.getUser(userId) {
+                val builderUnlock = AlertDialog.Builder(context!!)
+                builderUnlock.setTitle(getString(R.string.dialog_unlock_title))
+                builderUnlock.setMessage(getString(R.string.dialog_unlock_body, it.currentXp))
+                builderUnlock.setPositiveButton("Ok", onUnlock)
+                builderUnlock.setNegativeButton(getString(R.string.cancel), null)
+                builderUnlock.show()
+            }
         }
     }
 
