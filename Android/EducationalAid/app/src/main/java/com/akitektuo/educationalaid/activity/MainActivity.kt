@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
                                         auth.signOut()
                                         pickNameDialog()
                                     } else {
-                                        database.addUser(Database.User(auth.currentUser?.photoUrl.toString(), auth.currentUser?.displayName!!, auth.currentUser?.email!!, id = auth.currentUser?.uid!!))
+                                        database.addUser(Database.User(auth.currentUser?.displayName!!, auth.currentUser?.email!!, auth.currentUser?.photoUrl.toString(), id = auth.currentUser?.uid!!))
                                         preference.setDefault()
                                         buildFragments()
                                     }

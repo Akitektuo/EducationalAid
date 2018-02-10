@@ -8,13 +8,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.akitektuo.educationalaid.R
+import com.squareup.picasso.Picasso
 
 /**
  * Created by Akitektuo on 10.02.2018.
  */
 class PeopleAdapter(private val people: ArrayList<Person>) : RecyclerView.Adapter<PeopleAdapter.ViewHolder>() {
 
-    data class Person(val context: Context, val image: String, val name: String, val email: String, val isFollowed: Boolean, val onClick: (isFollowed: Boolean) -> Unit)
+    data class Person(val context: Context, val image: String, val name: String, val email: String, var isFollowed: Boolean, val onClick: (isFollowed: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_people, parent, false))
@@ -32,7 +33,7 @@ class PeopleAdapter(private val people: ArrayList<Person>) : RecyclerView.Adapte
         private val buttonFollow = view.findViewById<ImageView>(R.id.buttonFollow)
 
         fun bind(person: Person) = with(person) {
-            //            Picasso.with(context).load(image).into(imagePerson)
+            Picasso.with(context).load(image).placeholder(R.drawable.profile_picture_default).into(imagePerson)
             textName.text = name
             textEmail.text = email
             if (isFollowed) {
@@ -40,10 +41,12 @@ class PeopleAdapter(private val people: ArrayList<Person>) : RecyclerView.Adapte
             }
             buttonFollow.setOnClickListener {
                 onClick(isFollowed)
-                if (isFollowed) {
+                isFollowed = if (isFollowed) {
                     buttonFollow.setImageResource(R.drawable.follow)
+                    false
                 } else {
                     buttonFollow.setImageResource(R.drawable.unfollow)
+                    true
                 }
             }
         }

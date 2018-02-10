@@ -28,6 +28,7 @@ import com.akitektuo.educationalaid.storage.preference.SettingsPreference.Compan
 import com.akitektuo.educationalaid.util.ItemTouchHelperCallback
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_question.*
+import java.util.*
 
 /**
  * Created by Akitektuo on 03.01.2018.
@@ -500,6 +501,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                     it.currentXp += 5
                     if (it.currentXp > it.level * 100) {
                         it.level++
+                        database.addAction(Database.Action(userId, 6, it.level.toString(), Date().time))
                     }
                     database.editUser(it)
                 }

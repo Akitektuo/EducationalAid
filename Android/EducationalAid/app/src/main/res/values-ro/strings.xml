@@ -56,4 +56,21 @@
     <string name="find_people">Găsește lume</string>
     <string name="not_enough_xp">Nu aveți destul XP</string>
     <string name="search_by">Căutare după nume sau email</string>
+    <string name="empty_feed">Nicio noutate, urmăriți persoane și începeți să învățați!</string>
+    <string name="you_joined">V-ați alăturat platformei Ajutorul de Învățare.</string>
+    <string name="you_follow">Ați început să îl/o urmăriți pe %1$s.</string>
+    <string name="you_unfollow">V-ați oprit din a îl/o urmări pe %1$s.</string>
+    <string name="you_created">Ați creat lecția %1$s.</string>
+    <string name="you_started">Ați început lecția %1$s.</string>
+    <string name="you_completed">Ați finalizat lecția %1$s.</string>
+    <string name="you_reached">Ați ajuns la nivelul %1$d.</string>
+    <string name="user_joined">%1$s s-a alăturat platformei Ajutorul de Învățare.</string>
+    <string name="user_follow">%1$s a început să îl/o urmărească pe %2$s.</string>
+    <string name="user_unfollow">%1$s s-a oprit din a îl/o urmări pe %2$s.</string>
+    <string name="user_created">%1$s creat lecția %2$s.</string>
+    <string name="user_started">%1$s început lecția %2$s.</string>
+    <string name="user_completed">%1$s finalizat lecția %2$s.</string>
+    <string name="user_reached">%1$s a ajuns la nivelul %2$d.</string>
+    <string name="user_follow_you">%1$s a început să vă urmărească.</string>
+    <string name="user_unfollow_you">%1$s s-a oprit din a vă urmări.</string>
 </resources>

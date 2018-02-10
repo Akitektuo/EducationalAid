@@ -15,6 +15,7 @@ import com.akitektuo.educationalaid.storage.database.Database
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_learn.*
+import java.util.*
 
 /**
  * Created by Akitektuo on 31.12.2017.
@@ -58,11 +59,19 @@ class LearnFragment : Fragment() {
                                 var progress = 0
                                 if (userLesson.started) {
                                     progress = it.count { !it.locked }
+                                    if (progress == it.size && !userLesson.completed) {
+                                        database.addAction(Database.Action(userId, 5, model.id, Date().time))
+                                        userLesson.completed = true
+                                        database.editUserLesson(userLesson)
+                                    }
                                 }
                                 viewHolder.bind(LessonViewHolder.Lesson(activity?.applicationContext!!, model.name, model.image, progress, it.size, {
                                     if (isPaid) {
-                                        userLesson.started = true
-                                        database.editUserLesson(userLesson)
+                                        if (!userLesson.started) {
+                                            userLesson.started = true
+                                            database.editUserLesson(userLesson)
+                                            database.addAction(Database.Action(userId, 4, userLesson.lessonId, Date().time))
+                                        }
                                         val intent = Intent(context, LessonActivity::class.java)
                                         intent.putExtra("key_id", model.id)
                                         startActivity(intent)

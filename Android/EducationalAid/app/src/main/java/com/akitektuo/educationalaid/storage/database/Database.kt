@@ -7,6 +7,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import java.util.*
 
 /**
  * Created by Akitektuo on 01.02.2018.
@@ -36,6 +37,7 @@ class Database {
             val admin: Boolean = false,
             val paid: Boolean = false,
             var started: Boolean = false,
+            var completed: Boolean = false,
             var id: String = "")
 
     /**
@@ -169,6 +171,7 @@ class Database {
         if (user.id.isEmpty()) {
             user.id = databaseUsers.push().key
         }
+        addAction(Action(user.id, 0, "", Date().time))
         bindUserWithLessons(user.id)
         if (image == null) {
             databaseUsers.child(user.id).setValue(user)
@@ -195,8 +198,9 @@ class Database {
             override fun onDataChange(data: DataSnapshot?) {
                 val lessons = ArrayList<Lesson>()
                 data?.children?.mapNotNullTo(lessons, { it.getValue(Lesson::class.java) })
-                lessons.filter { it.visibility != 0 }.forEach { lessons.remove(it) }
+                lessons.filter { it.visibility != 2 }.forEach { lessons.remove(it) }
                 lessons.forEach {
+                    addUserLesson(UserLesson(userId, it.id, false, it.price == 0.0, false, false))
                     getChapterAll(it) {
                         it.forEach {
                             val chapter = it
@@ -272,7 +276,10 @@ class Database {
         databaseUsers.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(data: DataSnapshot?) {
-                afterResult(data?.getValue(User::class.java)!!)
+                val user = data?.getValue(User::class.java)
+                if (user != null) {
+                    afterResult(user)
+                }
             }
 
             override fun onCancelled(error: DatabaseError?) {
@@ -390,7 +397,7 @@ class Database {
         })
     }
 
-    fun getActionAll(user: User, afterResult: (actions: ArrayList<Action>) -> Unit) {
+    fun getActionAll(userId: String, afterResult: (actions: ArrayList<Action>) -> Unit) {
         databaseActions.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError?) {
 
@@ -401,7 +408,8 @@ class Database {
                 data?.children?.mapNotNullTo(actions, {
                     it.getValue<Action>(Action::class.java)
                 })
-                afterResult(actions.filter { it.userId == user.id }.sortedByDescending { it.date } as ArrayList<Action>)
+                actions.filter { it.userId != userId && it.message != userId }.forEach { actions.remove(it) }
+                afterResult(actions)
             }
         })
     }
@@ -422,6 +430,21 @@ class Database {
 
             override fun onDataChange(data: DataSnapshot?) {
                 afterResult(data?.getValue(UserFollower::class.java)!!)
+            }
+        })
+    }
+
+    fun getUserFollower(userId: String, otherUserId: String, afterResult: (usersFollowers: ArrayList<UserFollower>) -> Unit) {
+        databaseUsersFollowers.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val usersFollowers = ArrayList<UserFollower>()
+                data?.children?.mapNotNullTo(usersFollowers, { it.getValue(UserFollower::class.java) })
+                usersFollowers.filter { userId != it.followerId || otherUserId != it.userId }.forEach { usersFollowers.remove(it) }
+                afterResult(usersFollowers)
             }
         })
     }
@@ -894,8 +917,10 @@ class Database {
                                             if (it.size > 0) {
                                                 val nextModule = it[0]
                                                 getUserStatus(userId, nextModule.id, {
-                                                    it.status = 1
-                                                    editUserStatus(it)
+                                                    if (it.status == 0) {
+                                                        it.status = 1
+                                                        editUserStatus(it)
+                                                    }
                                                 })
                                                 getModuleIQAll(nextModule.id) {
                                                     if (it.size > 0) {
@@ -920,8 +945,10 @@ class Database {
                         } else {
                             val nextModule = it[currentModule.position]
                             getUserStatus(userId, nextModule.id, {
-                                it.status = 1
-                                editUserStatus(it)
+                                if (it.status == 0) {
+                                    it.status = 1
+                                    editUserStatus(it)
+                                }
                             })
                             getModuleIQAll(nextModule.id) {
                                 if (it.size > 0) {
@@ -943,6 +970,10 @@ class Database {
 
     fun editUserLesson(userLesson: Database.UserLesson) {
         databaseUsersLessons.child(userLesson.id).setValue(userLesson)
+    }
+
+    fun removeUserFollower(id: String) {
+        databaseUsersFollowers.child(id).removeValue()
     }
 
 }

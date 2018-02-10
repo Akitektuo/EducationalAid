@@ -135,11 +135,24 @@
         app:srcCompat="@color/colorSilverLight" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_feed"
+        android:id="@+id/listFeed"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageBarContent" />
+
+    <TextView
+        android:id="@+id/textFeedEmpty"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:text="@string/empty_feed"
+        android:textColor="@color/colorSilver"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -15,8 +15,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
-            android:src="@color/colorBlack" />
+            android:layout_marginTop="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -58,4 +58,21 @@
     <string name="find_people">Find people</string>
     <string name="not_enough_xp">Not enough XP</string>
     <string name="search_by">Search by name or email</string>
+    <string name="empty_feed">Feed is empty, follow people and start learning!</string>
+    <string name="you_joined">You joined Learning Aid.</string>
+    <string name="you_follow">You started following %1$s.</string>
+    <string name="you_unfollow">You stopped following %1$s.</string>
+    <string name="you_created">You created lesson %1$s.</string>
+    <string name="you_started">You started lesson %1$s.</string>
+    <string name="you_completed">You completed lesson %1$s.</string>
+    <string name="you_reached">You reached level %1$d.</string>
+    <string name="user_joined">%1$s joined Learning Aid.</string>
+    <string name="user_follow">%1$s started following %2$s.</string>
+    <string name="user_unfollow">%1$s stopped following %2$s.</string>
+    <string name="user_created">%1$s created lesson %2$s.</string>
+    <string name="user_started">%1$s started lesson %2$s.</string>
+    <string name="user_completed">%1$s completed lesson %2$s.</string>
+    <string name="user_reached">%1$s reached level %2$d.</string>
+    <string name="user_follow_you">%1$s started following you.</string>
+    <string name="user_unfollow_you">%1$s stopped following you.</string>
 </resources>
