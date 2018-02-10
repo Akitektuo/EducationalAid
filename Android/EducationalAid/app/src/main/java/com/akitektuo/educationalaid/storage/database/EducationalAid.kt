@@ -59,6 +59,7 @@ class EducationalAid : Application() {
         }
 
         // Bound inside min/max size for disk cache.
+        println("Int max is ${Int.MAX_VALUE} and the disk space is $size")
         return Math.max(Math.min(size, long), long)
     }
 

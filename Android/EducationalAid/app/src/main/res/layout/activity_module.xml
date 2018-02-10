@@ -24,7 +24,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginEnd="64dp"
+            android:layout_marginStart="64dp"
             android:text="First Module"
+            android:textAlignment="center"
             android:textColor="@color/colorBlack"
             android:textSize="24sp"
             android:textStyle="bold" />

@@ -55,4 +55,5 @@
     <string name="save">Salvați</string>
     <string name="find_people">Găsește lume</string>
     <string name="not_enough_xp">Nu aveți destul XP</string>
+    <string name="search_by">Căutare după nume sau email</string>
 </resources>

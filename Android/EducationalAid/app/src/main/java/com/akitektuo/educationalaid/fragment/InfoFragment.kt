@@ -27,7 +27,6 @@ class InfoFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: Database
     private lateinit var moduleIQId: String
-    private var isLocked: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = inflater.inflate(R.layout.fragment_info, container, false)
 
@@ -38,7 +37,6 @@ class InfoFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         val bundle = arguments
         moduleIQId = bundle?.getString(KEY_ID_MIQ)!!
-        isLocked = bundle.getBoolean(KEY_LOCKED)
         // get data from db for ID
         database.getInfo(bundle.getString(KEY_ID)!!, {
             textTitle.text = it.title
@@ -53,7 +51,7 @@ class InfoFragment : Fragment() {
             } else {
                 textImportant.text = it.importance
             }
-            if (isLocked) {
+            if (bundle.getBoolean(KEY_LOCKED)) {
                 imageLocked.visibility = View.VISIBLE
             }
 
@@ -82,7 +80,9 @@ class InfoFragment : Fragment() {
 
     fun unlockFragment() {
         imageLocked.visibility = View.GONE
-        isLocked = false
+        val bundle = arguments
+        bundle?.putBoolean(KEY_LOCKED, false)
+        arguments = bundle
         database.getUserMIQ(auth.currentUser?.uid!!, moduleIQId, {
             if (it.locked) {
                 it.locked = false

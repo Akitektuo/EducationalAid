@@ -61,7 +61,6 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
     private lateinit var auth: FirebaseAuth
     private lateinit var moduleIQId: String
     private lateinit var userId: String
-    private var isLocked = true
 
     private data class FillIn(val editText: EditText, val text: String, var nextFocus: EditText? = null) : TextWatcher {
 
@@ -105,7 +104,6 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
         userId = auth.currentUser?.uid!!
         moduleIQId = bundle?.getString(KEY_ID_MIQ)!!
-        isLocked = bundle.getBoolean(KEY_LOCKED)
         database.getQuestion(bundle.getString(KEY_ID)!!, {
             textCount.text = getString(R.string.out_of, it.position, bundle.getInt(KEY_TOTAL))
             textTask.text = it.task
@@ -116,7 +114,7 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                 TYPE_DRAG_IN_ORDER -> decodeForDragInOrder(it.solving)
                 TYPE_DRAG_AND_DROP -> decodeForDragAndDrop(it.solving)
             }
-            if (isLocked) {
+            if (bundle.getBoolean(KEY_LOCKED)) {
                 imageLocked.visibility = View.VISIBLE
             }
         })
@@ -491,7 +489,9 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
 
     fun unlockFragment() {
         imageLocked.visibility = View.GONE
-        isLocked = false
+        val bundle = arguments
+        bundle?.putBoolean(KEY_LOCKED, false)
+        arguments = bundle
         database.getUserMIQ(userId, moduleIQId, {
             if (it.locked) {
                 it.locked = false

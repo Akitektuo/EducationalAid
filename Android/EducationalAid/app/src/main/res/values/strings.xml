@@ -57,4 +57,5 @@
     <string name="save">Save</string>
     <string name="find_people">Find people</string>
     <string name="not_enough_xp">Not enough XP</string>
+    <string name="search_by">Search by name or email</string>
 </resources>

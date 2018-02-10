@@ -1,5 +1,6 @@
 package com.akitektuo.educationalaid.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.activity.FindActivity
 import com.akitektuo.educationalaid.storage.database.Database
 import com.akitektuo.educationalaid.util.Tool.Companion.load
 import com.firebase.client.Firebase
@@ -51,20 +53,22 @@ class ProfileFragment : Fragment() {
 
         textFindPeople.setOnClickListener {
             toast("Soon")
+            startActivity(Intent(context, FindActivity::class.java))
         }
     }
 
     fun updateUserInfo() {
-        database.getUser(auth.currentUser?.uid!!, {
-            textName.text = it.name
-            load(context!!, it.image, imageProfile, R.drawable.profile_picture_default)
-//            Picasso.with(context).load(it.image).placeholder(R.drawable.profile_picture_default).into(imageProfile)
-            textLevel.text = getString(R.string.level, it.level)
-            textCurrentXp.text = getString(R.string.xp, it.currentXp)
-            val targetXp = (it.currentXp / 100 + 1) * 100
-            textTargetXp.text = getString(R.string.xp, targetXp)
-            progressLevel.progress = it.currentXp % 100
-        })
+        if (auth.currentUser != null) {
+            database.getUser(auth.currentUser?.uid!!, {
+                textName.text = it.name
+                load(context!!, it.image, imageProfile, R.drawable.profile_picture_default)
+                textLevel.text = getString(R.string.level, it.level)
+                textCurrentXp.text = getString(R.string.xp, it.currentXp)
+                val targetXp = (it.currentXp / 100 + 1) * 100
+                textTargetXp.text = getString(R.string.xp, targetXp)
+                progressLevel.progress = it.currentXp % 100
+            })
+        }
     }
 
     private fun toast(msg: String) {
