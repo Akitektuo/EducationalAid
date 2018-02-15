@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                                     } else {
                                         database.addUser(Database.User(auth.currentUser?.displayName!!, auth.currentUser?.email!!, auth.currentUser?.photoUrl.toString(), id = auth.currentUser?.uid!!))
                                         preference.setDefault()
-                                        buildFragments()
+                                        showAlert()
                                     }
                                 } else {
                                     preference.setDefault()
@@ -196,7 +196,7 @@ class MainActivity : AppCompatActivity() {
                     database.addUser(Database.User(name!!, auth.currentUser?.email!!, id = auth.currentUser?.uid!!), selectedImage, {
                         auth.currentUser?.updateProfile(it)?.addOnCompleteListener {
                             alertLoading.dismiss()
-                            buildFragments()
+                            showAlert()
                         }
                     })
                 } else {
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
                             .build()
                     auth.currentUser?.updateProfile(profileUpdate)?.addOnCompleteListener {
                         alertLoading.dismiss()
-                        buildFragments()
+                        showAlert()
                     }
                 }
             } else {
@@ -267,6 +267,16 @@ class MainActivity : AppCompatActivity() {
                     ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CODE_STORAGE)
                 }
             }
+        }
+    }
+
+    private fun showAlert() {
+        val alertBuilder = AlertDialog.Builder(this)
+        alertBuilder.setCancelable(false)
+        alertBuilder.setTitle(R.string.read)
+        alertBuilder.setMessage(R.string.warning)
+        alertBuilder.setPositiveButton(R.string.continue_button) { _, _ ->
+            buildFragments()
         }
     }
 

@@ -73,4 +73,6 @@
     <string name="user_reached">%1$s a ajuns la nivelul %2$d.</string>
     <string name="user_follow_you">%1$s a început să vă urmărească.</string>
     <string name="user_unfollow_you">%1$s s-a oprit din a vă urmări.</string>
+    <string name="read">Citiți înainte sa folosiți aplicația!</string>
+    <string name="warning">Se aduce la cunoștința dumnevoastră că aplicația este încă în dezvoltare si e posibil să aibă erori. Aplicația a fost creată pentru o competiție digitală și datele actuale sunt pentru teste, deținătorul este SoloLearn. Va mulțumesc, distracție la învățat!</string>
 </resources>
