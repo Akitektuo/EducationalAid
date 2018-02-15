@@ -278,6 +278,7 @@ class MainActivity : AppCompatActivity() {
         alertBuilder.setPositiveButton(R.string.continue_button) { _, _ ->
             buildFragments()
         }
+        alertBuilder.show()
     }
 
     private fun buildFragments() {
