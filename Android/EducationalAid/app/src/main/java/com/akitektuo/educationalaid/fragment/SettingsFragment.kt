@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.Toast
 import com.akitektuo.educationalaid.R
@@ -91,30 +92,18 @@ class SettingsFragment : Fragment() {
 
         val database = Database()
         val userId = auth.currentUser?.uid!!
-        textReset.setOnClickListener {
-            database.getUserLessonAll(userId) {
-                it.forEach {
-                    it.started = false
-                    database.editUserLesson(it)
-                    database.getLesson(it.lessonId) {
-                        database.getChapterAll(it) {
-                            it.forEach {
-                                val chapter = it
-                                if (chapter.position == 1) {
-                                    database.getUserStatus(userId, it.id) {
-                                        it.status = 1
-                                        database.editUserStatus(it)
-                                    }
-                                } else {
-                                    database.getUserStatus(userId, it.id) {
-                                        it.status = 0
-                                        database.editUserStatus(it)
-                                    }
-                                }
-                                database.getModuleAll(it.id) {
+        database.getUser(userId) {
+            if (it.admin) {
+                textReset.setOnClickListener {
+                    database.getUserLessonAll(userId) {
+                        it.forEach {
+                            it.started = false
+                            database.editUserLesson(it)
+                            database.getLesson(it.lessonId) {
+                                database.getChapterAll(it) {
                                     it.forEach {
-                                        val module = it
-                                        if (module.position == 1 && chapter.position == 1) {
+                                        val chapter = it
+                                        if (chapter.position == 1) {
                                             database.getUserStatus(userId, it.id) {
                                                 it.status = 1
                                                 database.editUserStatus(it)
@@ -125,17 +114,33 @@ class SettingsFragment : Fragment() {
                                                 database.editUserStatus(it)
                                             }
                                         }
-                                        database.getModuleIQAll(it.id) {
+                                        database.getModuleAll(it.id) {
                                             it.forEach {
-                                                if (it.position == 1 && chapter.position == 1 && module.position == 1) {
-                                                    database.getUserMIQ(userId, it.id) {
-                                                        it.locked = false
-                                                        database.editUserMIQ(it)
+                                                val module = it
+                                                if (module.position == 1 && chapter.position == 1) {
+                                                    database.getUserStatus(userId, it.id) {
+                                                        it.status = 1
+                                                        database.editUserStatus(it)
                                                     }
                                                 } else {
-                                                    database.getUserMIQ(userId, it.id) {
-                                                        it.locked = true
-                                                        database.editUserMIQ(it)
+                                                    database.getUserStatus(userId, it.id) {
+                                                        it.status = 0
+                                                        database.editUserStatus(it)
+                                                    }
+                                                }
+                                                database.getModuleIQAll(it.id) {
+                                                    it.forEach {
+                                                        if (it.position == 1 && chapter.position == 1 && module.position == 1) {
+                                                            database.getUserMIQ(userId, it.id) {
+                                                                it.locked = false
+                                                                database.editUserMIQ(it)
+                                                            }
+                                                        } else {
+                                                            database.getUserMIQ(userId, it.id) {
+                                                                it.locked = true
+                                                                database.editUserMIQ(it)
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -146,6 +151,10 @@ class SettingsFragment : Fragment() {
                         }
                     }
                 }
+            } else {
+                imageBarSignOut.visibility = GONE
+                imageReset.visibility = GONE
+                textReset.visibility = GONE
             }
         }
 
