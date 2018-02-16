@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "681082361956-0q6amrq01bpuoffuuj7omuqfevdibn07.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.akitektuo.educationalaid",
+            "certificate_hash": "af4b4e273b068ba45bd9d6dfa12e729cb86f9122"
+          }
+        },
+        {
+          "client_id": "681082361956-j3hqobegofo489gq52daem5cqo1v1nfg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.akitektuo.educationalaid",
+            "certificate_hash": "9148fb99f31f30d2d3f6ac948848f2d05edcb34c"
+          }
+        },
+        {
           "client_id": "681082361956-sq5mm1ft71tder5prbdp2c3kptkh5e0b.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

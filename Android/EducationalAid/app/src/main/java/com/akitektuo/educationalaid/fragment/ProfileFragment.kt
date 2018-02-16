@@ -61,6 +61,7 @@ class ProfileFragment : Fragment() {
                         textTargetXp.text = getString(R.string.xp, targetXp)
                         progressLevel.progress = user.currentXp % 100
                     }
+                    updateFeed()
                 }
             })
         }
@@ -104,115 +105,116 @@ class ProfileFragment : Fragment() {
             } else {
                 textFeedEmpty.visibility = GONE
                 listFeed.visibility = VISIBLE
-            }
-            it.sortedByDescending { it.date }.forEach {
-                val action = FeedAdapter.Action(it.type, "Error", SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(it.date))
-                println("Error - userId:${it.userId} messageId:${it.message}")
-                when (userId) {
-                    it.userId -> {
-                        when (it.type) {
-                            0 -> {
-                                action.message = getString(R.string.you_joined)
-                                addAction(action)
-                            }
-                            1 -> database.getUser(it.message) {
-                                action.message = getString(R.string.you_follow, it.name)
-                                addAction(action)
-                            }
-                            2 -> database.getUser(it.message) {
-                                action.message = getString(R.string.you_unfollow, it.name)
-                                addAction(action)
-                            }
-                            3 -> database.getLesson(it.message) {
-                                action.message = getString(R.string.you_created, it.name)
-                                addAction(action)
-                            }
-                            4 -> database.getLesson(it.message) {
-                                action.message = getString(R.string.you_started, it.name)
-                                addAction(action)
-                            }
-                            5 -> database.getLesson(it.message) {
-                                action.message = getString(R.string.you_completed, it.name)
-                                addAction(action)
-                            }
-                            6 -> database.getUser(userId) {
-                                action.message = getString(R.string.you_reached, it.level)
-                                addAction(action)
-                            }
-                        }
-                    }
-                    it.message -> {
-                        when (it.type) {
-                            1 -> database.getUser(it.userId) {
-                                action.message = getString(R.string.user_follow_you, it.name)
-                                addAction(action)
-                            }
-                            2 -> database.getUser(it.userId) {
-                                action.message = getString(R.string.user_unfollow_you, it.name)
-                                addAction(action)
-                            }
-                        }
-                    }
-                    else -> {
-                        when (it.type) {
-                            0 -> database.getUser(it.userId) {
-                                action.message = getString(R.string.user_joined, it.name)
-                                addAction(action)
-                            }
-                            1 -> {
-                                val actionDB = it
-                                database.getUser(actionDB.userId) {
-                                    val userAction = it
-                                    database.getUser(actionDB.message) {
-                                        action.message = getString(R.string.user_follow, userAction.name, it.name)
-                                        addAction(action)
-                                    }
-                                }
-                            }
-                            2 -> {
-                                val actionDB = it
-                                database.getUser(actionDB.userId) {
-                                    val userAction = it
-                                    database.getUser(actionDB.message) {
-                                        action.message = getString(R.string.user_unfollow, userAction.name, it.name)
-                                        addAction(action)
-                                    }
-                                }
-                            }
-                            3 -> {
-                                val actionDB = it
-                                database.getUser(actionDB.userId) {
-                                    val userAction = it
-                                    database.getLesson(actionDB.message) {
-                                        action.message = getString(R.string.user_created, userAction.name, it.name)
-                                        addAction(action)
-                                    }
-                                }
-                            }
-                            4 -> {
-                                val actionDB = it
-                                database.getUser(actionDB.userId) {
-                                    val userAction = it
-                                    database.getLesson(actionDB.message) {
-                                        action.message = getString(R.string.user_started, userAction.name, it.name)
-                                        addAction(action)
-                                    }
-                                }
-                            }
-                            5 -> {
-                                val actionDB = it
-                                database.getUser(actionDB.userId) {
-                                    val userAction = it
-                                    database.getLesson(actionDB.message) {
-                                        action.message = getString(R.string.user_completed, userAction.name, it.name)
-                                        addAction(action)
-                                    }
-                                }
-                            }
-                            6 -> {
-                                database.getUser(it.userId) {
-                                    action.message = getString(R.string.user_reached, it.name, it.level)
+                actions.clear()
+                it.sortedByDescending { it.date }.forEach {
+                    val action = FeedAdapter.Action(it.type, "Error", SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(it.date))
+                    println("Error - userId:${it.userId} messageId:${it.message}")
+                    when (userId) {
+                        it.userId -> {
+                            when (it.type) {
+                                0 -> {
+                                    action.message = getString(R.string.you_joined)
                                     addAction(action)
+                                }
+                                1 -> database.getUser(it.message) {
+                                    action.message = getString(R.string.you_follow, it.name)
+                                    addAction(action)
+                                }
+                                2 -> database.getUser(it.message) {
+                                    action.message = getString(R.string.you_unfollow, it.name)
+                                    addAction(action)
+                                }
+                                3 -> database.getLesson(it.message) {
+                                    action.message = getString(R.string.you_created, it.name)
+                                    addAction(action)
+                                }
+                                4 -> database.getLesson(it.message) {
+                                    action.message = getString(R.string.you_started, it.name)
+                                    addAction(action)
+                                }
+                                5 -> database.getLesson(it.message) {
+                                    action.message = getString(R.string.you_completed, it.name)
+                                    addAction(action)
+                                }
+                                6 -> database.getUser(userId) {
+                                    action.message = getString(R.string.you_reached, it.level)
+                                    addAction(action)
+                                }
+                            }
+                        }
+                        it.message -> {
+                            when (it.type) {
+                                1 -> database.getUser(it.userId) {
+                                    action.message = getString(R.string.user_follow_you, it.name)
+                                    addAction(action)
+                                }
+                                2 -> database.getUser(it.userId) {
+                                    action.message = getString(R.string.user_unfollow_you, it.name)
+                                    addAction(action)
+                                }
+                            }
+                        }
+                        else -> {
+                            when (it.type) {
+                                0 -> database.getUser(it.userId) {
+                                    action.message = getString(R.string.user_joined, it.name)
+                                    addAction(action)
+                                }
+                                1 -> {
+                                    val actionDB = it
+                                    database.getUser(actionDB.userId) {
+                                        val userAction = it
+                                        database.getUser(actionDB.message) {
+                                            action.message = getString(R.string.user_follow, userAction.name, it.name)
+                                            addAction(action)
+                                        }
+                                    }
+                                }
+                                2 -> {
+                                    val actionDB = it
+                                    database.getUser(actionDB.userId) {
+                                        val userAction = it
+                                        database.getUser(actionDB.message) {
+                                            action.message = getString(R.string.user_unfollow, userAction.name, it.name)
+                                            addAction(action)
+                                        }
+                                    }
+                                }
+                                3 -> {
+                                    val actionDB = it
+                                    database.getUser(actionDB.userId) {
+                                        val userAction = it
+                                        database.getLesson(actionDB.message) {
+                                            action.message = getString(R.string.user_created, userAction.name, it.name)
+                                            addAction(action)
+                                        }
+                                    }
+                                }
+                                4 -> {
+                                    val actionDB = it
+                                    database.getUser(actionDB.userId) {
+                                        val userAction = it
+                                        database.getLesson(actionDB.message) {
+                                            action.message = getString(R.string.user_started, userAction.name, it.name)
+                                            addAction(action)
+                                        }
+                                    }
+                                }
+                                5 -> {
+                                    val actionDB = it
+                                    database.getUser(actionDB.userId) {
+                                        val userAction = it
+                                        database.getLesson(actionDB.message) {
+                                            action.message = getString(R.string.user_completed, userAction.name, it.name)
+                                            addAction(action)
+                                        }
+                                    }
+                                }
+                                6 -> {
+                                    database.getUser(it.userId) {
+                                        action.message = getString(R.string.user_reached, it.name, it.level)
+                                        addAction(action)
+                                    }
                                 }
                             }
                         }
