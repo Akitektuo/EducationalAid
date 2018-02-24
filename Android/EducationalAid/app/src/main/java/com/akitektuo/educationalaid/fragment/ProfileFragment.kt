@@ -61,6 +61,14 @@ class ProfileFragment : Fragment() {
                         textTargetXp.text = getString(R.string.xp, targetXp)
                         progressLevel.progress = user.currentXp % 100
                     }
+                }
+            })
+            database.databaseActions.addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError?) {
+
+                }
+
+                override fun onDataChange(data: DataSnapshot?) {
                     updateFeed()
                 }
             })
@@ -75,8 +83,6 @@ class ProfileFragment : Fragment() {
         actions = ArrayList()
         adapter = FeedAdapter(actions)
         listFeed.adapter = adapter
-
-        updateFeed()
     }
 
     fun updateUserInfo() {
@@ -106,6 +112,7 @@ class ProfileFragment : Fragment() {
                 textFeedEmpty.visibility = GONE
                 listFeed.visibility = VISIBLE
                 actions.clear()
+                adapter.notifyDataSetChanged()
                 it.sortedByDescending { it.date }.forEach {
                     val action = FeedAdapter.Action(it.type, "Error", SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(it.date))
                     println("Error - userId:${it.userId} messageId:${it.message}")

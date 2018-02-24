@@ -145,7 +145,7 @@ class Database {
 
     val databaseUsers = database.child("Users")
     private val databaseUsersLessons = database.child("UsersLessons")
-    private val databaseActions = database.child("Actions")
+    val databaseActions = database.child("Actions")
     private val databaseUsersFollowers = database.child("UsersFollowers")
     val databaseLessons = database.child("Lessons")!!
     val databaseChapters = database.child("Chapters")

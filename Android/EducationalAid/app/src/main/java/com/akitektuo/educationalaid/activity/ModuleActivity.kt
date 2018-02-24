@@ -46,6 +46,7 @@ class ModuleActivity : AppCompatActivity() {
 
         val fragments = ArrayList<PagerAdapter.TabFragment>()
 
+        val userId = auth.currentUser?.uid!!
         database.getModuleIQAll(moduleId, {
             val modulesIsQs = it
             database.databaseUsersMsIsQs.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -61,7 +62,7 @@ class ModuleActivity : AppCompatActivity() {
                         val arguments = Bundle()
                         val moduleIQ = it
                         var locked = true
-                        usersMsIsQs.filter { it.moduleIQId == moduleIQ.id }.forEach {
+                        usersMsIsQs.filter { it.moduleIQId == moduleIQ.id && userId == it.userId }.forEach {
                             locked = it.locked
                         }
                         if (it.question) {

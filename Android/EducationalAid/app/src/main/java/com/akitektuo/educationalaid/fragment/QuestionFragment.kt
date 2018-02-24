@@ -207,12 +207,11 @@ class QuestionFragment : Fragment(), DraggableAdapter.OnStartDragListener {
                     }
                 }
                 getString(R.string.continue_button) -> {
-                    layoutFillIn.removeAllViews()
+                    decodeForFillIn(info)
                     (activity as ModuleActivity).continueOnClick(moduleIQId)
                 }
                 getString(R.string.try_again) -> {
                     decodeForFillIn(info)
-                    reset()
                 }
             }
         }

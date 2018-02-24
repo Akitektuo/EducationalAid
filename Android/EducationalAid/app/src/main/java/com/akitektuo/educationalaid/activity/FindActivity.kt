@@ -3,6 +3,8 @@ package com.akitektuo.educationalaid.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.PeopleAdapter
 import com.akitektuo.educationalaid.storage.database.Database
@@ -59,19 +61,25 @@ class FindActivity : AppCompatActivity() {
                 usersTemp.filter { it.name.contains(search, true) || it.email.contains(search, true) }.forEach { users.add(it) }
                 people.clear()
                 adapter.notifyDataSetChanged()
-                for (user in users) {
-                    database.getUserFollower(userId, user.id) {
-                        val userConnections = it
-                        people.add(PeopleAdapter.Person(this@FindActivity, user.image, user.name, user.email, userConnections.size != 0, {
-                            if (it) {
-                                database.removeUserFollower(userConnections[0].id)
-                                database.addAction(Database.Action(userId, 2, user.id, Date().time))
-                            } else {
-                                database.addUserFollower(Database.UserFollower(user.id, userId))
-                                database.addAction(Database.Action(userId, 1, user.id, Date().time))
-                            }
-                        }))
-                        adapter.notifyItemInserted(people.size - 1)
+                if (users.size == 0) {
+                    textNoResults.text = getString(R.string.no_results, search)
+                    textNoResults.visibility = VISIBLE
+                } else {
+                    textNoResults.visibility = GONE
+                    for (user in users) {
+                        database.getUserFollower(userId, user.id) {
+                            val userConnections = it
+                            people.add(PeopleAdapter.Person(this@FindActivity, user.image, user.name, user.email, userConnections.size != 0, {
+                                if (it) {
+                                    database.removeUserFollower(userConnections[0].id)
+                                    database.addAction(Database.Action(userId, 2, user.id, Date().time))
+                                } else {
+                                    database.addUserFollower(Database.UserFollower(user.id, userId))
+                                    database.addAction(Database.Action(userId, 1, user.id, Date().time))
+                                }
+                            }))
+                            adapter.notifyItemInserted(people.size - 1)
+                        }
                     }
                 }
             }
