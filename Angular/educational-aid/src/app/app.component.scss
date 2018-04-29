@@ -1,0 +1,22 @@
+.container {
+    height: 40em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.parent-holder {
+    margin: 0;
+    width: 30em;
+    height: 30em;
+}
+
+button {
+    text-transform: none;
+    font-weight: bold;
+}
+
+.content {
+    height: 25em;
+    overflow-y: auto;
+}

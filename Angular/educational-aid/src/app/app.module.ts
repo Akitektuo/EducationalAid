@@ -5,10 +5,14 @@ import {
   MatCardModule, 
   MatButtonModule, 
   MatSelectModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatListModule
 } from '@angular/material'
+import { AngularFireModule } from 'angularfire2';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
 
 import { AppComponent } from './app.component';
+import { environment } from '../environments/environment.prod';
 
 
 @NgModule({
@@ -21,7 +25,10 @@ import { AppComponent } from './app.component';
     MatCardModule,
     MatButtonModule,
     MatSelectModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatListModule,
+    AngularFireDatabaseModule,
+    AngularFireModule.initializeApp(environment.firebase, "educational-aid")
   ],
   providers: [],
   bootstrap: [AppComponent]

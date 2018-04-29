@@ -1,2 +1,18 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<mat-toolbar color="primary"></mat-toolbar>
+<mat-toolbar class="mat-elevation-z4" color="primary" role="header">
+    <span>Learning Aid</span>
+</mat-toolbar>
+<div class="container">
+    <mat-card class="parent-holder">
+        <mat-card-title>Lessons</mat-card-title>
+        <mat-card-subtitle>Pick a lesson to edit</mat-card-subtitle>
+        <mat-card-content>
+            <mat-list class="content" *ngFor="let lesson of lessons | async">
+                <mat-list-item>{{ lesson | json }}</mat-list-item>
+            </mat-list>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-button>ADD</button>
+        </mat-card-actions>
+    </mat-card>
+</div>
