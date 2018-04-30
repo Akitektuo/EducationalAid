@@ -23,7 +23,7 @@ class DraggableAdapter(private val context: Context, private val dragTexts: Arra
         holder.bind(dragTexts[position].text, dragStartListener, holder)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): DraggableAdapter.ViewHolder = ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_draggable, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DraggableAdapter.ViewHolder = ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_draggable, parent, false))
 
     override fun getItemCount(): Int = dragTexts.size
 

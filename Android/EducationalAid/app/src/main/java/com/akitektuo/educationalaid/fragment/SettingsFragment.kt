@@ -16,6 +16,7 @@ import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.Toast
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.activity.DataActivity
 import com.akitektuo.educationalaid.activity.EditActivity
 import com.akitektuo.educationalaid.activity.EditActivity.Companion.KEY_NAME
 import com.akitektuo.educationalaid.activity.MainActivity
@@ -151,10 +152,16 @@ class SettingsFragment : Fragment() {
                         }
                     }
                 }
+                textModifyData.setOnClickListener {
+                    startActivity(Intent(context, DataActivity::class.java))
+                }
             } else {
                 imageBarSignOut.visibility = GONE
                 imageReset.visibility = GONE
                 textReset.visibility = GONE
+                imageBarReset.visibility = GONE
+                imageModifyData.visibility = GONE
+                textModifyData.visibility = GONE
             }
         }
 

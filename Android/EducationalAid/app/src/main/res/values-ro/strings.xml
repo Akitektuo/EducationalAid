@@ -76,4 +76,9 @@
     <string name="read">Citiți înainte sa folosiți aplicația!</string>
     <string name="warning">Se aduce la cunoștința dumnevoastră că aplicația este încă în dezvoltare si e posibil să aibă erori. Aplicația a fost creată pentru o competiție digitală și datele actuale sunt pentru teste, deținătorul este SoloLearn. Va mulțumesc, distracție la învățat!</string>
     <string name="no_results">Niciun rezultat găsit pentru \"%1$s\".</string>
+    <string name="modify_data">Modificare date</string>
+    <string name="lesson">Lecția</string>
+    <string name="chapter">Capitolul</string>
+    <string name="module">Modulul</string>
+    <string name="create_info_question">Crează o informație sau întrebare</string>
 </resources>

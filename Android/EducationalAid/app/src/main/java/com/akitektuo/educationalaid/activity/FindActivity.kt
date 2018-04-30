@@ -1,5 +1,6 @@
 package com.akitektuo.educationalaid.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -7,6 +8,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.adapter.PeopleAdapter
+import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -45,6 +47,10 @@ class FindActivity : AppCompatActivity() {
         buttonSearch.setOnClickListener {
             showUsersForSearch(editSearch.text.toString())
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(SettingsFragment.Language(newBase).wrap())
     }
 
     private fun showUsersForSearch(search: String) {

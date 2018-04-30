@@ -8,6 +8,7 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by Akitektuo on 01.02.2018.
@@ -554,6 +555,22 @@ class Database {
             override fun onDataChange(data: DataSnapshot?) {
                 afterResult(data?.getValue(Lesson::class.java)!!)
             }
+        })
+    }
+
+    fun getLessons(afterResult: (lessons: ArrayList<Lesson>) -> Unit) {
+        databaseLessons.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val lessons = ArrayList<Lesson>()
+                data?.children?.mapNotNullTo(lessons, { it.getValue(Lesson::class.java) })
+                afterResult(lessons)
+            }
+
         })
     }
 

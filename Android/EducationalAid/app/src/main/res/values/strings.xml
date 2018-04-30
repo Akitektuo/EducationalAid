@@ -78,4 +78,9 @@
     <string name="read">Read before using the app!</string>
     <string name="warning">Please be aware that the app is still in development and you might encounter crashes and bugs. The app was created for a software competition and the current data is only for testing, the author it is SoloLearn. Thank you, have fun learning!</string>
     <string name="no_results">No results found for \"%1$s\".</string>
+    <string name="modify_data">Modify data</string>
+    <string name="lesson">Lesson</string>
+    <string name="chapter">Chapter</string>
+    <string name="module">Module</string>
+    <string name="create_info_question">Create a information or question</string>
 </resources>
