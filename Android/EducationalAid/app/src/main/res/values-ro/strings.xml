@@ -81,4 +81,10 @@
     <string name="chapter">Capitolul</string>
     <string name="module">Modulul</string>
     <string name="create_info_question">Crează o informație sau întrebare</string>
+    <string name="create_new_lesson">Creare lecție nouă…</string>
+    <string name="create_new_chapter">Crează capitol nou…</string>
+    <string name="create_new_module">Crează modul nou…</string>
+    <string name="name">Nume</string>
+    <string name="create">Creare</string>
+    <string name="position">Poziția</string>
 </resources>

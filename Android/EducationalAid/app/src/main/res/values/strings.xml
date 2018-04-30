@@ -83,4 +83,10 @@
     <string name="chapter">Chapter</string>
     <string name="module">Module</string>
     <string name="create_info_question">Create a information or question</string>
+    <string name="create_new_lesson">Create new lesson…</string>
+    <string name="create_new_chapter">Create new chapter…</string>
+    <string name="create_new_module">Create new module…</string>
+    <string name="name">Name</string>
+    <string name="create">Create</string>
+    <string name="position">Position</string>
 </resources>

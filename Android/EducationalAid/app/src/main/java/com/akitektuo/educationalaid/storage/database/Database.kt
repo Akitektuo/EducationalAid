@@ -35,7 +35,7 @@ class Database {
     data class UserLesson(
             val userId: String = "",
             val lessonId: String = "",
-            val admin: Boolean = false,
+            var admin: Boolean = false,
             val paid: Boolean = false,
             var started: Boolean = false,
             var completed: Boolean = false,
@@ -530,20 +530,40 @@ class Database {
         })
     }
 
-    fun addLesson(lesson: Lesson, image: Uri? = null, afterResult: () -> Unit = {}): String {
+    fun addLesson(userId: String, lesson: Lesson, image: Uri? = null, afterResult: () -> Unit = {}): String {
         if (lesson.id.isEmpty()) {
             lesson.id = databaseLessons.push().key
         }
         if (image == null) {
             databaseLessons.child(lesson.id).setValue(lesson)
+            generateUsersLessons(userId, lesson, afterResult)
         } else {
             storageLessons.child(lesson.id).putFile(image).addOnSuccessListener {
                 lesson.image = it.downloadUrl.toString()
                 databaseLessons.child(lesson.id).setValue(lesson)
-                afterResult()
+                generateUsersLessons(userId, lesson, afterResult)
             }
         }
         return lesson.id
+    }
+
+    private fun generateUsersLessons(userId: String, lesson: Lesson, afterResult: () -> Unit = {}) {
+        databaseUsers.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val users = ArrayList<User>()
+                data?.children?.mapNotNullTo(users, { it.getValue(User::class.java) })
+                users.forEach {
+                    addUserLesson(UserLesson(it.id, lesson.id, paid = true))
+                }
+                afterResult()
+            }
+
+        })
     }
 
     fun getLesson(id: String, afterResult: (lesson: Lesson) -> Unit) {
@@ -580,6 +600,7 @@ class Database {
         }
         if (image == null || imageLocked == null) {
             databaseChapters.child(chapter.id).setValue(chapter)
+
         } else {
             storageChapters.child(chapter.id).putFile(image).addOnSuccessListener {
                 chapter.image = it.downloadUrl.toString()
