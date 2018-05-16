@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.adapter.ChapterAdapter
 import com.akitektuo.educationalaid.adapter.ChapterViewHolder
 import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
-import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -47,14 +47,10 @@ class LessonActivity : AppCompatActivity() {
         super.onStart()
 
         val userId = auth.currentUser?.uid!!
-        val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Chapter, ChapterViewHolder>(
-                Database.Chapter::class.java,
-                R.layout.item_chapter,
-                ChapterViewHolder::class.java,
-                database.databaseChapters
-        ) {
-            override fun populateViewHolder(viewHolder: ChapterViewHolder, model: Database.Chapter, position: Int) {
-                viewHolder.makeGone()
+        val adapter = ChapterAdapter()
+        database.getChapters {
+            it.forEach {
+                val model = it
                 database.isChapterAvailableForLesson(model.id, lessonId, {
                     database.getUserStatus(userId, model.id, {
                         val status = it.status
@@ -72,7 +68,7 @@ class LessonActivity : AppCompatActivity() {
                                     for (x in modules) {
                                         userStatus.filter { it.userId == userId && it.statusId == x.id }.forEach { modulesForCount.add(it) }
                                     }
-                                    viewHolder.bind(ChapterViewHolder.Chapter(this@LessonActivity, model.name, status, modulesForCount.count { it.status != 0 } - 1, it.size, model.image, model.imageLocked, {
+                                    adapter.add(ChapterViewHolder.Chapter(this@LessonActivity, model.name, status, modulesForCount.count { it.status != 0 } - 1, it.size, model.image, model.imageLocked, {
                                         val intent = Intent(this@LessonActivity, ChapterActivity::class.java)
                                         intent.putExtra("key_id", model.id)
                                         startActivity(intent)
@@ -85,7 +81,45 @@ class LessonActivity : AppCompatActivity() {
                 })
             }
         }
-        listChapters.adapter = firebaseAdapter
+//        val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Chapter, ChapterViewHolder>(
+//                Database.Chapter::class.java,
+//                R.layout.item_chapter,
+//                ChapterViewHolder::class.java,
+//                database.databaseChapters
+//        ) {
+//            override fun populateViewHolder(viewHolder: ChapterViewHolder, model: Database.Chapter, position: Int) {
+//                viewHolder.makeGone()
+//                database.isChapterAvailableForLesson(model.id, lessonId, {
+//                    database.getUserStatus(userId, model.id, {
+//                        val status = it.status
+//                        database.getModulesForChapter(model, {
+//                            val modules = it
+//                            database.databaseUsersStatus.addListenerForSingleValueEvent(object : ValueEventListener {
+//                                override fun onCancelled(error: DatabaseError?) {
+//
+//                                }
+//
+//                                override fun onDataChange(data: DataSnapshot?) {
+//                                    val userStatus = ArrayList<Database.UserStatus>()
+//                                    data?.children?.mapNotNullTo(userStatus, { it.getValue(Database.UserStatus::class.java) })
+//                                    val modulesForCount = ArrayList<Database.UserStatus>()
+//                                    for (x in modules) {
+//                                        userStatus.filter { it.userId == userId && it.statusId == x.id }.forEach { modulesForCount.add(it) }
+//                                    }
+//                                    viewHolder.bind(ChapterViewHolder.Chapter(this@LessonActivity, model.name, status, modulesForCount.count { it.status != 0 } - 1, it.size, model.image, model.imageLocked, {
+//                                        val intent = Intent(this@LessonActivity, ChapterActivity::class.java)
+//                                        intent.putExtra("key_id", model.id)
+//                                        startActivity(intent)
+//                                    }))
+//                                }
+//                            })
+//
+//                        })
+//                    })
+//                })
+//            }
+//        }
+        listChapters.adapter = adapter
 
     }
 

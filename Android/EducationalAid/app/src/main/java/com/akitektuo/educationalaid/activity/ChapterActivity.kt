@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.akitektuo.educationalaid.R
+import com.akitektuo.educationalaid.adapter.ModuleAdapter
 import com.akitektuo.educationalaid.adapter.ModuleViewHolder
 import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
-import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_chapter.*
 
@@ -43,31 +43,51 @@ class ChapterActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        database.getModuleAll(chapterId, {
+        val adapter = ModuleAdapter()
+        database.getModuleAll(chapterId) {
             val total = it.size
-            val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Module, ModuleViewHolder>(
-                    Database.Module::class.java,
-                    R.layout.item_module,
-                    ModuleViewHolder::class.java,
-                    database.databaseModules
-            ) {
-                override fun populateViewHolder(viewHolder: ModuleViewHolder, model: Database.Module, position: Int) {
-                    viewHolder.makeGone()
-                    database.isModuleAvailableForChapter(model.id, chapterId, {
-                        database.getUserStatus(auth.currentUser?.uid!!, model.id, {
-                            val status = it.status
-                            database.getModuleIQAll(model.id) {
-                                viewHolder.bind(ModuleViewHolder.Module(this@ChapterActivity, model.position, total, model.name, it.count { it.question }, status, {
-                                    val intent = Intent(this@ChapterActivity, ModuleActivity::class.java)
-                                    intent.putExtra("key_id", model.id)
-                                    startActivity(intent)
-                                }))
-                            }
-                        })
+            it.forEach {
+                val model = it
+                database.isModuleAvailableForChapter(model.id, chapterId, {
+                    database.getUserStatus(auth.currentUser?.uid!!, model.id, {
+                        val status = it.status
+                        database.getModuleIQAll(model.id) {
+                            adapter.add(ModuleViewHolder.Module(this@ChapterActivity, model.position, total, model.name, it.count { it.question }, status, {
+                                val intent = Intent(this@ChapterActivity, ModuleActivity::class.java)
+                                intent.putExtra("key_id", model.id)
+                                startActivity(intent)
+                            }))
+                        }
                     })
-                }
+                })
             }
-            listModules.adapter = firebaseAdapter
-        })
+        }
+        listModules.adapter = adapter
+//        database.getModuleAll(chapterId, {
+//            val total = it.size
+//            val firebaseAdapter = object : FirebaseRecyclerAdapter<Database.Module, ModuleViewHolder>(
+//                    Database.Module::class.java,
+//                    R.layout.item_module,
+//                    ModuleViewHolder::class.java,
+//                    database.databaseModules
+//            ) {
+//                override fun populateViewHolder(viewHolder: ModuleViewHolder, model: Database.Module, position: Int) {
+//                    viewHolder.makeGone()
+//                    database.isModuleAvailableForChapter(model.id, chapterId, {
+//                        database.getUserStatus(auth.currentUser?.uid!!, model.id, {
+//                            val status = it.status
+//                            database.getModuleIQAll(model.id) {
+//                                viewHolder.bind(ModuleViewHolder.Module(this@ChapterActivity, model.position, total, model.name, it.count { it.question }, status, {
+//                                    val intent = Intent(this@ChapterActivity, ModuleActivity::class.java)
+//                                    intent.putExtra("key_id", model.id)
+//                                    startActivity(intent)
+//                                }))
+//                            }
+//                        })
+//                    })
+//                }
+//            }
+//            listModules.adapter = firebaseAdapter
+//        })
     }
 }

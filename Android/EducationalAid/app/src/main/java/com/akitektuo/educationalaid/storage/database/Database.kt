@@ -993,4 +993,20 @@ class Database {
         databaseUsersFollowers.child(id).removeValue()
     }
 
+    fun getChapters(afterResult: (chapters: ArrayList<Chapter>) -> Unit) {
+        databaseChapters.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot?) {
+                val chapters = ArrayList<Chapter>()
+                data?.children?.mapNotNullTo(chapters, { it.getValue(Chapter::class.java) })
+                afterResult(chapters)
+            }
+
+        })
+    }
+
 }
