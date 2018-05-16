@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/editModuleName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:hint="@string/name"
+        android:imeOptions="actionNext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/colorBlack" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/editModulePosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:hint="@string/position"
+        android:imeOptions="actionDone"
+        android:minWidth="128dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editModuleName"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/colorBlack" />
+
+</android.support.constraint.ConstraintLayout>

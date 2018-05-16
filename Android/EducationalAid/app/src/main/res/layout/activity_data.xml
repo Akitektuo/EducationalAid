@@ -31,28 +31,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/buttonBack" />
 
-    <com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView
+    <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
         android:id="@+id/editLesson"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:completionThreshold="1"
         android:hint="@string/lesson"
         android:imeOptions="actionNone"
-        android:inputType="textCapWords"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonBack"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelTextColor="@color/colorBlack" />
 
-    <com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView
+    <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
         android:id="@+id/editChapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:completionThreshold="1"
         android:hint="@string/chapter"
         android:imeOptions="actionNone"
-        android:inputType="textCapWords"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,14 +60,14 @@
         app:met_floatingLabel="highlight"
         app:met_floatingLabelTextColor="@color/colorBlack" />
 
-    <com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView
+    <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
         android:id="@+id/editModule"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:completionThreshold="1"
         android:hint="@string/module"
         android:imeOptions="actionNone"
-        android:inputType="textCapWords"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso
 
 class LessonViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
-    data class Lesson(val context: Context, val title: String, val image: String, val progress: Int, val total: Int, val onClick: () -> Unit)
+    data class Lesson(val context: Context, val title: String, val image: String, val progress: Int, var total: Int, val onClick: () -> Unit)
 
     private val textTitle = view.findViewById<TextView>(R.id.textTitle)
     private val imageLesson = view.findViewById<ImageView>(R.id.imageLesson)
@@ -35,6 +35,9 @@ class LessonViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         load(context, image, imageLesson)
         progressCount.progress = progress
         progressCount.max = total
+        if (total == 0) {
+            total = 1
+        }
         textProgress.text = context.getString(R.string.percent, progress * 100 / total)
         view.setOnClickListener {
             onClick()
