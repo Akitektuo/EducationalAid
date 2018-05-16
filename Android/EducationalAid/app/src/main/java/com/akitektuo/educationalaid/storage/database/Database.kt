@@ -77,7 +77,7 @@ class Database {
             var id: String = "")
 
     data class UserStatus(
-            val userId: String = "",
+            var userId: String = "",
             val statusId: String = "",
             var status: Int = 0,
             var id: String = "")

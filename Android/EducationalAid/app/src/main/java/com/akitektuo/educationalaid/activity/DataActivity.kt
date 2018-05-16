@@ -215,9 +215,9 @@ class DataActivity : AppCompatActivity() {
                 val users = ArrayList<Database.User>()
                 data?.children?.mapNotNullTo(users, { it.getValue(Database.User::class.java) })
                 users.forEach {
-                    database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, "-LBN2XywX-VStgw4v9EK", 1))
-                    database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, "-LBN2XyyAMOPT3JVjZ8n", 0))
-                    database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, "-LBN2XyzmY4-oFRj0gJI", 0))
+                    database.addUserStatus(Database.UserStatus(it.id, "-LBN2XywX-VStgw4v9EK", 1))
+                    database.addUserStatus(Database.UserStatus(it.id, "-LBN2XyyAMOPT3JVjZ8n", 0))
+                    database.addUserStatus(Database.UserStatus(it.id, "-LBN2XyzmY4-oFRj0gJI", 0))
                 }
             }
         })
@@ -249,7 +249,11 @@ class DataActivity : AppCompatActivity() {
                             val users = ArrayList<Database.User>()
                             data?.children?.mapNotNullTo(users, { it.getValue(Database.User::class.java) })
                             users.forEach {
-                                database.addUserStatus(Database.UserStatus(auth.currentUser?.uid!!, id, 0))
+                                var status = 0
+                                if (position == 1) {
+                                    status = 1
+                                }
+                                database.addUserStatus(Database.UserStatus(it.id, id, status))
                             }
                         }
                     })
