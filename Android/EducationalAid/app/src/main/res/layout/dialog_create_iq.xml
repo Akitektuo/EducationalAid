@@ -86,4 +86,46 @@
         app:met_floatingLabel="highlight"
         app:met_floatingLabelTextColor="@color/colorBlack" />
 
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/editQuestionTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="top"
+        android:hint="Task"
+        android:imeOptions="actionNext"
+        android:minHeight="96dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerIQ"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/colorBlack" />
+
+    <Spinner
+        android:id="@+id/spinnerType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:entries="@array/data_solving_types"
+        android:minWidth="128dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editQuestionTask" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/editQuestionSolving"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="top"
+        android:hint="Solving"
+        android:imeOptions="actionNext"
+        android:minHeight="128dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerType"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelTextColor="@color/colorBlack" />
+
 </android.support.constraint.ConstraintLayout>

@@ -8,9 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import com.akitektuo.educationalaid.R
 import com.akitektuo.educationalaid.fragment.SettingsFragment
 import com.akitektuo.educationalaid.storage.database.Database
@@ -18,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.rengwuxian.materialedittext.MaterialEditText
 import kotlinx.android.synthetic.main.activity_data.*
 
 class DataActivity : AppCompatActivity() {
@@ -270,7 +269,123 @@ class DataActivity : AppCompatActivity() {
     }
 
     private fun openIQDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.create_info_question))
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_create_iq, null)
+//        val editName = view.findViewById<EditText>(R.id.editModuleName)
+//        val editPosition = view.findViewById<EditText>(R.id.editModulePosition)
+        val editPosition = view.findViewById<MaterialEditText>(R.id.editIQPosition)
+        val spinner = view.findViewById<Spinner>(R.id.spinnerIQ)
+        val editInfoTitle = view.findViewById<MaterialEditText>(R.id.editInfoTitle)
+        val editInfoContent = view.findViewById<MaterialEditText>(R.id.editInfoContent)
+        val editInfoImage = view.findViewById<MaterialEditText>(R.id.editInfoImage)
+        val editInfoImportance = view.findViewById<MaterialEditText>(R.id.editInfoImportance)
+        val editQuestionTask = view.findViewById<MaterialEditText>(R.id.editQuestionTask)
+        val spinnerType = view.findViewById<Spinner>(R.id.spinnerType)
+        val editQuestionSolving = view.findViewById<MaterialEditText>(R.id.editQuestionSolving)
+        var position = 0
+        spinner.onItemSelectedListener = CustomOnItemSelectedListener {
+            position = it
+            if (position == 0) {
+                editInfoTitle.visibility = View.VISIBLE
+                editInfoContent.visibility = View.VISIBLE
+                editInfoImage.visibility = View.VISIBLE
+                editInfoImportance.visibility = View.VISIBLE
 
+                editQuestionTask.visibility = View.GONE
+                spinnerType.visibility = View.GONE
+                editQuestionSolving.visibility = View.GONE
+                editQuestionTask.setText("")
+                editQuestionSolving.setText("")
+            } else {
+                editInfoTitle.visibility = View.GONE
+                editInfoContent.visibility = View.GONE
+                editInfoImage.visibility = View.GONE
+                editInfoImportance.visibility = View.GONE
+                editInfoTitle.setText("")
+                editInfoContent.setText("")
+                editInfoImage.setText("")
+                editInfoImportance.setText("")
+
+                editQuestionTask.visibility = View.VISIBLE
+                spinnerType.visibility = View.VISIBLE
+                editQuestionSolving.visibility = View.VISIBLE
+            }
+        }
+        var type = 0
+        spinnerType.onItemSelectedListener = CustomOnItemSelectedListener {
+            type = it
+        }
+        builder.setView(view)
+        builder.setPositiveButton(getString(R.string.create), { _, _ ->
+            val textPosition = editPosition.text.toString()
+            if (textPosition.isNotEmpty()) {
+                val positionIQ = Integer.parseInt(textPosition)
+                if (position == 0) {
+                    val title = editInfoTitle.text.toString()
+                    val content = editInfoContent.text.toString()
+                    val image = editInfoImage.text.toString()
+                    val importance = editInfoImportance.text.toString()
+                    if (title.isNotEmpty() && content.isNotEmpty()) {
+                        val idInfo = database.addInfo(Database.Info(title, content, image, importance))
+                        val id = database.addModuleIQ(Database.ModuleIQ(focusedModule.id, "", idInfo, false, positionIQ))
+                        var locked = true
+                        if (positionIQ == 1) {
+                            locked = false
+                        }
+                        database.databaseUsers.addListenerForSingleValueEvent(object : ValueEventListener {
+
+                            override fun onCancelled(p0: DatabaseError?) {
+
+                            }
+
+                            override fun onDataChange(data: DataSnapshot?) {
+                                val users = ArrayList<Database.User>()
+                                data?.children?.mapNotNullTo(users, { it.getValue(Database.User::class.java) })
+                                users.forEach {
+                                    database.addUserMIQ(Database.UserMIQ(it.id, id, locked))
+                                }
+                            }
+                        })
+                    } else {
+                        toast("Title and/or content missing")
+                    }
+                } else {
+                    val task = editQuestionTask.text.toString()
+                    val solving = editQuestionSolving.text.toString()
+                    if (task.isNotEmpty() && solving.isNotEmpty()) {
+                        val idQuestion = database.addQuestion(Database.Question(task, solving, positionIQ, type))
+                        val id = database.addModuleIQ(Database.ModuleIQ(focusedModule.id, idQuestion, "", true, positionIQ))
+                        var locked = true
+                        if (positionIQ == 1) {
+                            locked = false
+                        }
+                        database.databaseUsers.addListenerForSingleValueEvent(object : ValueEventListener {
+
+                            override fun onCancelled(p0: DatabaseError?) {
+
+                            }
+
+                            override fun onDataChange(data: DataSnapshot?) {
+                                val users = ArrayList<Database.User>()
+                                data?.children?.mapNotNullTo(users, { it.getValue(Database.User::class.java) })
+                                users.forEach {
+                                    database.addUserMIQ(Database.UserMIQ(it.id, id, locked))
+                                }
+                            }
+                        })
+                    } else {
+                        toast("Task and/or solving missing")
+                    }
+                }
+            } else {
+                toast("Position empty")
+            }
+        })
+        builder.setNeutralButton(R.string.cancel, { _, _ ->
+        })
+        builder.setCancelable(false)
+        builder.show()
     }
 
     private fun buildLoadingDialog() : AlertDialog {
@@ -287,6 +402,18 @@ class DataActivity : AppCompatActivity() {
 
     private fun toast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    class CustomOnItemSelectedListener(val onClick: (position: Int) -> Unit) : AdapterView.OnItemSelectedListener {
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+        }
+
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            onClick(position)
+        }
+
     }
 
 }

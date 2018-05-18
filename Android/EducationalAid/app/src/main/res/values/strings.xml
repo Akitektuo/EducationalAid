@@ -93,4 +93,11 @@
         <item>Information</item>
         <item>Question</item>
     </string-array>
+    <string-array name="data_solving_types">
+        <item>Fill in</item>
+        <item>Single choice</item>
+        <item>Multiple choice</item>
+        <item>Drag in order</item>
+        <item>Drag and drop</item>
+    </string-array>
 </resources>
