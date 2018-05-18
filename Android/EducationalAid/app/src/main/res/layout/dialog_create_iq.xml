@@ -51,6 +51,7 @@
         android:gravity="top"
         android:hint="Content"
         android:minHeight="128dp"
+        android:maxHeight="256dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editInfoTitle"
