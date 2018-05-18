@@ -89,4 +89,8 @@
     <string name="name">Name</string>
     <string name="create">Create</string>
     <string name="position">Position</string>
+    <string-array name="data_add_options">
+        <item>Information</item>
+        <item>Question</item>
+    </string-array>
 </resources>
